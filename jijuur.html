@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Жижүүрийн цагийн бүртгэл - jigjuur.html</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-50/60 via-blue-50/30 to-indigo-100/40 min-h-screen p-4 md:p-6 font-sans text-gray-800">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Толгой хэсэг -->
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-sm border border-indigo-100 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-md">
+                    🛡️
+                </div>
+                <div>
+                    <h2 class="text-xl font-extrabold text-gray-800 flex items-center gap-2">
+                        Жижүүрийн цагийн болон ирцийн бүртгэл
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-0.5">Албан хаагчдын ирсэн, гарсан цаг болон засварын бүртгэлийн систем</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-50 border border-indigo-200 px-4 py-2 rounded-2xl text-xs font-bold text-indigo-700">
+                    Өнөөдрийн огноо: <span id="currentDateSpan"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Үндсэн ажиллах хэсэг -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Зүүн тал: Цаг бүртгэх форм -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-sm border border-indigo-100 p-6 lg:col-span-5 space-y-5">
+                <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2 pb-2 border-b border-indigo-100">
+                    ✍️ Шинэ цагийн бүртгэл оруулах
+                </h3>
+
+                <form id="attendanceForm" onsubmit="handleAttendanceSubmit(event)" class="space-y-4">
+                    <!-- Ажилтан сонгох / эсвэл шинээр оруулах -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1.5">Албан хаагч сонгох</label>
+                        <select id="employeeSelect" onchange="checkEmployeeType()" class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                            <!-- JS-ээр эрхлэгчийн баталгаажсан жагсаалт орно -->
+                        </select>
+                    </div>
+
+                    <!-- Хэрэв шинэ ажилтан бол нэр бичих хэсэг (Эхэндээ hidden) -->
+                    <div id="newEmployeeInputDiv" class="hidden">
+                        <label class="block text-xs font-bold text-amber-600 mb-1.5">⚠️ Шинэ ажилтны бүтэн нэр (Эрхлэгчтэй тулгах шаардлагатай)</label>
+                        <input type="text" id="newEmployeeNameInput" placeholder="Овог, нэр..." class="w-full text-xs border border-amber-300 rounded-xl p-2.5 bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1.5">Огноо</label>
+                            <input type="date" id="recordDate" required class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1.5">Ээлж</label>
+                            <select id="recordShift" class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                                <option value="Өдөр">Өдрийн ээлж</option>
+                                <option value="Шөнө">Шөнийн ээлж</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1.5">Ирсэн цаг</label>
+                            <input type="time" id="checkInTime" required class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1.5">Гарсан цаг</label>
+                            <input type="time" id="checkOutTime" class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        </div>
+                    </div>
+
+                    <!-- Засварын шалтгаан болон Хариуцагч -->
+                    <div class="space-y-3 bg-indigo-50/40 p-3.5 rounded-2xl border border-indigo-100">
+                        <h4 class="text-[11px] font-extrabold text-indigo-700 uppercase">🛠️ Хоцорсон шалтгаан (Хоцорсон үед бөглөнө)</h4>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Хоцролтын шалтгаан</label>
+                            <input type="text" id="repairReason" placeholder="Жишээ нь: Цаг хоцорч ирсэн шалтгаан..." class="w-full text-xs border border-indigo-200 rounded-xl p-2 bg-white font-medium focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Хариуцагч ажилтан / Жижүүр</label>
+                            <input type="text" id="responsiblePerson" placeholder="Жижүүрийн нэр..." class="w-full text-xs border border-indigo-200 rounded-xl p-2 bg-white font-medium focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1.5">Нэмэлт тайлбар</label>
+                        <textarea id="recordNote" rows="2" placeholder="Бусад шаардлагатай мэдээлэл..." class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition cursor-pointer">
+                        Бүртгэлийг хадгалах
+                    </button>
+                </form>
+            </div>
+
+            <!-- Баруун тал: Бүртгэгдсэн тайлан болон хяналт -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-sm border border-indigo-100 p-6 lg:col-span-7 space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-indigo-100">
+                    <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                        📊 Жижүүрийн цагийн бүртгэлийн тайлан
+                    </h3>
+                    <span class="text-[10px] bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full font-bold" id="totalRecordsCount">Нийт: 0</span>
+                </div>
+
+                <!-- Хайлт болон шүүлтүүр -->
+                <div class="flex gap-2">
+                    <input type="text" id="searchInput" onkeyup="renderRecordsTable()" placeholder="Нэрээр хайх..." class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-indigo-50/30 focus:outline-none">
+                </div>
+
+                <!-- Тайлангийн хүснэгт -->
+                <div class="overflow-x-auto max-h-[500px] overflow-y-auto rounded-2xl border border-indigo-100">
+                    <table class="w-full text-left text-xs text-gray-600">
+                        <thead class="bg-indigo-50 text-indigo-800 uppercase font-bold sticky top-0">
+                            <tr>
+                                <th class="p-3">Ажилтан</th>
+                                <th class="p-3">Огноо / Ээлж</th>
+                                <th class="p-3">Цаг (Ирсэн/Гарсан)</th>
+                                <th class="p-3">Төлөв / Хоцролт</th>
+                                <th class="p-3 text-center">Үйлдэл</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTableBody" class="divide-y divide-indigo-50 bg-white">
+                            <!-- JS-ээр өгөгдөл орно -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JavaScript Логик -->
+    <script>
+        // Эрхлэгчийн баталгаажуулсан идэвхтэй албан хаагчдын жагсаалт
+        let approvedEmployees = [
+            "Бат-Эрдэнэ Сүхбат",
+            "Оюунчимэг Дорж",
+            "Тэмүүлэн Мөнхбаяр",
+            "Хулан Батсайхан",
+            "Ганзориг Эрдэнэ"
+        ];
+
+        // Жижүүрийн цагийн бүртгэлийн өгөгдлийн сан
+        let attendanceRecords = [
+            {
+                id: 1,
+                employeeName: "Бат-Эрдэнэ Сүхбат",
+                isNew: false,
+                date: "2026-11-18",
+                shift: "Өдөр",
+                checkIn: "08:45",
+                checkOut: "18:00",
+                repairReason: "",
+                responsiblePerson: "Жижүүр Болд",
+                note: "Хэвийн ирсэн",
+                status: "Баталгаажсан"
+            },
+            {
+                id: 2,
+                employeeName: "Оюунчимэг Дорж",
+                isNew: false,
+                date: "2026-11-18",
+                shift: "Өдөр",
+                checkIn: "09:20",
+                checkOut: "18:00",
+                repairReason: "Автобус саатсан тул 20 минут хоцорсон",
+                responsiblePerson: "Жижүүр Болд",
+                note: "Хоцорсон цаг бүртгэл",
+                status: "Хоцорсон"
+            }
+        ];
+
+        // Хуудас ачаалахад ажиллах
+        window.onload = function() {
+            document.getElementById('currentDateSpan').innerText = new Date().toISOString().split('T')[0];
+            document.getElementById('recordDate').value = new Date().toISOString().split('T')[0];
+            populateEmployeeDropdown();
+            renderRecordsTable();
+        };
+
+        // Ажилтны сонголтыг дүүргэх
+        function populateEmployeeDropdown() {
+            const select = document.getElementById('employeeSelect');
+            select.innerHTML = '<option value="">-- Албан хаагч сонгох --</option>';
+            
+            approvedEmployees.forEach(emp => {
+                let opt = document.createElement('option');
+                opt.value = emp;
+                opt.innerText = emp;
+                select.appendChild(opt);
+            });
+
+            let otherOpt = document.createElement('option');
+            otherOpt.value = "NEW_EMPLOYEE";
+            otherOpt.innerText = "➕ Шинэ ажилтан (Бүртгэлд байхгүй)";
+            select.appendChild(otherOpt);
+        }
+
+        // Шинэ ажилтан эсэхийг шалгах
+        function checkEmployeeType() {
+            const val = document.getElementById('employeeSelect').value;
+            const newDiv = document.getElementById('newEmployeeInputDiv');
+            if (val === "NEW_EMPLOYEE") {
+                newDiv.classList.remove('hidden');
+            } else {
+                newDiv.classList.add('hidden');
+            }
+        }
+
+        // Бүртгэл хадгалах болон давхардал шалгах
+        function handleAttendanceSubmit(event) {
+            event.preventDefault();
+
+            let empName = "";
+            let isNew = false;
+            let selectedVal = document.getElementById('employeeSelect').value;
+
+            if (selectedVal === "NEW_EMPLOYEE") {
+                empName = document.getElementById('newEmployeeNameInput').value.trim();
+                isNew = true;
+                if (!empName) {
+                    alert("Шинэ ажилтны нэрийг оруулна уу!");
+                    return;
+                }
+            } else if (selectedVal) {
+                empName = selectedVal;
+            } else {
+                alert("Албан хаагч сонгоно уу!");
+                return;
+            }
+
+            let date = document.getElementById('recordDate').value;
+            let shift = document.getElementById('recordShift').value;
+            let checkIn = document.getElementById('checkInTime').value;
+            let checkOut = document.getElementById('checkOutTime').value;
+            let repairReason = document.getElementById('repairReason').value.trim();
+            let responsible = document.getElementById('responsiblePerson').value.trim();
+            let note = document.getElementById('recordNote').value.trim();
+
+            // 1. Ижил хүн, өдөр, ээлжийн давхардлыг шалгах
+            let duplicate = attendanceRecords.find(r => r.employeeName === empName && r.date === date && r.shift === shift);
+            if (duplicate) {
+                alert(`⚠️ Анхаар: Энэ хүн (${empName}) тухайн өдөр (${date}), ${shift}-ийн ээлжинд аль хэдийн бүртгэгдсэн байна!`);
+                return;
+            }
+
+            // 2. Статус тодорхойлох (Шинэ ажилтан бол эрхлэгчтэй тулгах төлөвтэй)
+            let status = "Баталгаажсан";
+            if (isNew) {
+                status = "Эрхлэгчтэй тулгах (Шинэ)";
+            } else if (repairReason) {
+                status = "Засвартай";
+            }
+
+            // Шинэ бичлэг үүсгэх
+            let newRecord = {
+                id: attendanceRecords.length + 1,
+                employeeName: empName,
+                isNew: isNew,
+                date: date,
+                shift: shift,
+                checkIn: checkIn,
+                checkOut: checkOut || "Байхгүй",
+                repairReason: repairReason,
+                responsiblePerson: responsible || "Тодорхойгүй",
+                note: note,
+                status: status
+            };
+
+            attendanceRecords.unshift(newRecord);
+
+            // Формыг цэвэрлэх
+            document.getElementById('attendanceForm').reset();
+            document.getElementById('recordDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('newEmployeeInputDiv').classList.add('hidden');
+
+            renderRecordsTable();
+            alert("Жижүүрийн цагийн бүртгэл амжилттай хадгалагдлаа!");
+        }
+
+        // Хүснэгтэд харуулах
+        function renderRecordsTable() {
+            const tbody = document.getElementById('recordsTableBody');
+            tbody.innerHTML = '';
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = attendanceRecords.filter(r => r.employeeName.toLowerCase().includes(searchVal));
+
+            document.getElementById('totalRecordsCount').innerText = `Нийт: ${filtered.length}`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400 italic">Бүртгэл олдсонгүй.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(rec => {
+                let statusBadge = "bg-emerald-100 text-emerald-700";
+                if (rec.status.includes("Засвартай")) statusBadge = "bg-amber-100 text-amber-700";
+                else if (rec.status.includes("Тулгах")) statusBadge = "bg-purple-100 text-purple-700";
+
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-indigo-50/40 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-gray-800">
+                        ${rec.employeeName}
+                        ${rec.isNew ? '<span class="ml-1 text-[9px] bg-purple-600 text-white px-1.5 py-0.5 rounded-full">Шинэ</span>' : ''}
+                    </td>
+                    <td class="p-3">
+                        <div class="font-medium">${rec.date}</div>
+                        <div class="text-[10px] text-gray-400">${rec.shift} ээлж</div>
+                    </td>
+                    <td class="p-3">
+                        <div>📥 Ирсэн: <span class="font-bold text-indigo-600">${rec.checkIn}</span></div>
+                        <div>📤 Гарсан: <span class="font-bold text-gray-600">${rec.checkOut}</span></div>
+                    </td>
+                    <td class="p-3 space-y-1">
+                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold ${statusBadge}">${rec.status}</span>
+                        ${rec.repairReason ? `<div class="text-[10px] text-amber-800 bg-amber-50 p-1 rounded border border-amber-200"><b>Шалгаан:</b> ${rec.repairReason}</div>` : ''}
+                        ${rec.responsiblePerson ? `<div class="text-[10px] text-gray-500"><b>Хариуцагч:</b> ${rec.responsiblePerson}</div>` : ''}
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteRecord(${rec.id})" class="text-red-500 hover:text-red-700 font-bold text-xs p-1 rounded hover:bg-red-50 cursor-pointer">🗑️ Устгах</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Бүртгэл устгах
+        function deleteRecord(id) {
+            if (confirm("Энэхүү бүртгэлийг устгахдаа итгэлтэй байна уу?")) {
+                attendanceRecords = attendanceRecords.filter(r => r.id !== id);
+                renderRecordsTable();
+            }
+        }
+    </script>
+</body>
+</html>

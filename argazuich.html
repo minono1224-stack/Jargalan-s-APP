@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Арга зүйчийн Самбар</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00b894;
+            --primary-hover: #00a884;
+            --secondary-color: #fdcb6e;
+            --bg-gradient: linear-gradient(135deg, #55efc4 0%, #00b894 50%, #0984e3 100%);
+            --card-bg: #ffffff;
+            --text-color: #2f3542;
+            --border-color: #b2dfdb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Зүүн талын навигацийн 15 цэс */
+        aside {
+            width: 310px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px dashed var(--border-color);
+            background: #e0f2f1;
+        }
+
+        .sidebar-header h2 {
+            font-size: 14px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .sidebar-menu {
+            padding: 8px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: calc(100vh - 120px);
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 4px;
+            border: 2px solid transparent;
+            background: #f4fbfb;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #57606f;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .menu-btn:hover {
+            background: #b2dfdb;
+            color: #2f3542;
+            border-color: #00897b;
+        }
+
+        .menu-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+        }
+
+        /* Баруун талын үндсэн контент */
+        main {
+            flex: 1;
+            margin-left: 310px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 4px solid #fff;
+        }
+
+        .section-pane { display: none; }
+        .section-pane.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.title {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        .subtitle {
+            color: #747d8c;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        h3.sub-heading {
+            font-size: 14px;
+            color: #00796b;
+            margin: 20px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #57606f;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 12px;
+            background-color: #f4fbfb;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(0, 184, 148, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        th, td {
+            border: 1px solid #dfe4ea;
+            padding: 9px;
+            text-align: left;
+            font-size: 11px;
+        }
+
+        th {
+            background-color: #e0f2f1;
+            color: #00796b;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+
+        .btn-export {
+            background-color: #0984e3;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
+        }
+        .btn-export:hover { background-color: #74b9ff; }
+
+        .btn-danger {
+            background-color: #ff4757;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+        }
+        .btn-danger:hover { background-color: #ff6b81; }
+
+        .btn-mic {
+            background-color: #ffa502;
+            box-shadow: 0 4px 10px rgba(255, 165, 2, 0.3);
+            color: white;
+            border: none;
+            padding: 7px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-mic:hover { background-color: #ff9f1a; }
+        .btn-mic.recording {
+            background-color: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .media-box {
+            background: #f8fffe;
+            border: 1px dashed #80cbc4;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .media-preview {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #00695c;
+        }
+
+        .media-preview img {
+            max-width: 180px;
+            max-height: 120px;
+            border-radius: 8px;
+            margin-top: 6px;
+            display: block;
+            border: 1px solid #b2dfdb;
+        }
+
+        .media-preview audio {
+            width: 100%;
+            max-width: 340px;
+            margin-top: 6px;
+            display: block;
+        }
+
+        .stat-card {
+            background: #e0f2f1;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px dashed var(--primary-color);
+            text-align: center;
+        }
+
+        .stat-card h3 { font-size: 20px; color: var(--primary-color); margin-bottom: 5px; }
+        .stat-card p { font-size: 11px; color: #57606f; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- ЗҮҮН ТАЛЫН НАВИГАЦИЙН 15 ЦЭС -->
+    <aside>
+        <div>
+            <div class="sidebar-header">
+                <h2>🎯 Арга зүйчийн Самбар</h2>
+                <p id="sidebarMethodologistName" style="font-size: 11px; color: #00796b; font-weight: bold; margin-top: 3px;">Арга зүйч</p>
+                <p style="font-size: 10px; color: #747d8c;">Чандмань-Өндөр СӨБ (2025-2026)</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <button class="menu-btn active" onclick="switchSection('sec-1', this)"><i class="fa-solid fa-chart-line"></i> 1. Хяналтын самбар</button>
+                <button class="menu-btn" onclick="switchSection('sec-2', this)"><i class="fa-solid fa-book-open"></i> 2. Сургалтын хөтөлбөр</button>
+                <button class="menu-btn" onclick="switchSection('sec-3', this)"><i class="fa-solid fa-children"></i> 3. Бүлэг ба Хүүхдүүд</button>
+                <button class="menu-btn" onclick="switchSection('sec-4', this)"><i class="fa-solid fa-users-gear"></i> 4. Албан хаагчид</button>
+                <button class="menu-btn" onclick="switchSection('sec-5', this)"><i class="fa-solid fa-triangle-exclamation"></i> 5. Эрсдэлт бүлэг</button>
+                <button class="menu-btn" onclick="switchSection('sec-6', this)"><i class="fa-solid fa-hands-holding-child"></i> 6. ХБХ-тэй хүүхэд</button>
+                <button class="menu-btn" onclick="switchSection('sec-7', this)"><i class="fa-solid fa-shield-halved"></i> 7. Цэцэрлэгийн хяналт</button>
+                <button class="menu-btn" onclick="switchSection('sec-8', this)"><i class="fa-solid fa-utensils"></i> 8. Хоол үйлдвэрлэл</button>
+                <button class="menu-btn" onclick="switchSection('sec-9', this)"><i class="fa-solid fa-stethoscope"></i> 9. Эмч зөвлөж байна</button>
+                <button class="menu-btn" onclick="switchSection('sec-10', this)"><i class="fa-solid fa-file-lines"></i> 10. Тайлан (9–5 сар)</button>
+                <button class="menu-btn" onclick="switchSection('sec-11', this)"><i class="fa-solid fa-list-check"></i> 11. Даалгавар сан</button>
+                <button class="menu-btn" onclick="switchSection('sec-12', this)"><i class="fa-solid fa-chalkboard-user"></i> 12. КӨҮЧ арга зүйч</button>
+                <button class="menu-btn" onclick="switchSection('sec-13', this)"><i class="fa-solid fa-seedling"></i> 13. Арга зүйчийн өөрийн хөгжил</button>
+                <button class="menu-btn" onclick="switchSection('sec-14', this)"><i class="fa-solid fa-graduation-cap"></i> 14. Сургуульд бэлтгэгдсэн байдал</button>
+                <button class="menu-btn" onclick="switchSection('sec-15', this)"><i class="fa-solid fa-gears"></i> 15. Хувийн тохиргоо</button>
+            </div>
+        </div>
+
+        <div style="padding: 10px; border-top: 2px dashed var(--border-color); text-align: center;">
+            <a href="login.html" style="font-size: 11px; color: #ff4757; font-weight: bold; text-decoration: none;">🚪 Системээс гарах</a>
+        </div>
+    </aside>
+
+    <!-- БАРУУН ТАЛЫН ҮНДСЭН КОНТЕНТ -->
+    <main>
+        <div class="container">
+
+            <!-- 1. ХЯНАЛТЫН САМБАР -->
+            <div id="sec-1" class="section-pane active">
+                <h2 class="title">📊 Хяналтын самбар</h2>
+                <p class="subtitle">Цэцэрлэгийн үйл ажиллагааны ерөнхий нэгтгэл ба хурдан шилжих товчлуурууд.</p>
+                <div class="form-grid">
+                    <div class="stat-card"><h3>120</h3><p>Нийт хүүхдийн тоо</p></div>
+                    <div class="stat-card"><h3>6</h3><p>Нийт бүлэг (Үндсэн + Хувилбарт)</p></div>
+                    <div class="stat-card"><h3>18</h3><p>Албан хаагчдын тоо</p></div>
+                    <div class="stat-card" style="border-color:#ff4757; background:#fff5f5;"><h3 style="color:#ff4757;">3</h3><p>Эрсдэлтэй & ХБХ хүүхэд</p></div>
+                </div>
+            </div>
+
+            <!-- 2. СУРГАЛТЫН ХӨТӨЛБӨР -->
+            <div id="sec-2" class="section-pane">
+                <h2 class="title">📚 Сургалтын хөтөлбөр ба төлөвлөгөө</h2>
+                <p class="subtitle">Багш нарын жилийн, сарын, 7 хоног, өдрийн төлөвлөгөө болон дэглэм хянах.</p>
+                <div class="form-group"><label>Бүлгийн багш сонгох</label>
+                    <select><option>Батбаяр (Пороро бүлэг)</option><option>Саруул (Маша бүлэг)</option></select>
+                </div>
+                <div class="form-group"><label>Төлөвлөгөөний төрөл</label>
+                    <select><option>Жилийн ажлын төлөвлөгөө</option><option>Сарын ажлын төлөвлөгөө</option><option>Долоо хоногийн төлөвлөгөө</option><option>Өдөр тутмын төлөвлөгөө</option><option>Өдрийн дэглэм</option></select>
+                </div>
+                <div class="form-group"><label>Зөвлөгөө, зөвлөмж бичих</label><textarea rows="2" placeholder="Багшид өгөх зөвлөмж..."></textarea></div>
+                <div class="form-group"><label>Файл / Зураг хавсаргах (Word, PDF, Excel)</label><input type="file" accept="image/*,.doc,.docx,.pdf,.xlsx"></div>
+                <button class="btn" onclick="alert('✨ Хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 3. БҮЛЭГ БА ХҮҮХДҮҮД -->
+            <div id="sec-3" class="section-pane">
+                <h2 class="title">🧸 Бүлэг ба Хүүхдүүд</h2>
+                <p class="subtitle">Бүх бүлгийн хүүхдийн бүртгэл, хувийн хавтас, тайлан хянах.</p>
+                <div class="form-group"><label>Бүлэг сонгох</label><select><option>Пороро бүлэг (Үндсэн)</option><option>Бяцхан од (Хувилбарт)</option></select></div>
+                <table>
+                    <thead><tr><th>Нэр</th><th>Регистр</th><th>Нас</th><th>Үйлдэл</th></tr></thead>
+                    <tbody>
+                        <tr><td>Б.Тэмүүлэн</td><td>УД19253412</td><td>5</td><td><button class="btn" style="padding:3px 6px;" onclick="alert('📂 Профайл нээгдлээ')">Харах</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 4. АЛБАН ХААГЧИД -->
+            <div id="sec-4" class="section-pane">
+                <h2 class="title">👥 Албан хаагчдын удирдлага</h2>
+                <p class="subtitle">Ажилтан нэмэх, тайлан төлөвлөгөө шалгах, татаж авах.</p>
+                <table>
+                    <thead><tr><th>Нэр</th><th>Албан тушаал</th><th>Тайлан</th><th>Төлөвлөгөө</th></tr></thead>
+                    <tbody>
+                        <tr><td>Д.Батбаяр</td><td>Бүлгийн багш</td><td><button class="btn" style="padding:3px 6px;" onclick="alert('📄 Тайлан шалгах')">Харах</button></td><td><button class="btn" style="padding:3px 6px;" onclick="alert('📅 Төлөвлөгөө шалгах')">Харах</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 5. ЭРСДЭЛТ БҮЛЭГ -->
+            <div id="sec-5" class="section-pane">
+                <h2 class="title">⚠️ Эрсдэлт бүлгийн хүүхэд</h2>
+                <p class="subtitle">Бүлэг тус бүрийн эрсдэлт бүлгийн хүүхдийн хяналт ба зөвлөмж.</p>
+                <div class="form-group">
+                    <label>Зөвлөмж бичих талбар</label>
+                    <textarea id="sec5Text" rows="2" placeholder="Эрсдэлт бүлгийн хүүхдэд өгөх чиглэл..."></textarea>
+                </div>
+                <div class="media-box">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label>Зураг / Файл оруулах</label>
+                        <input type="file" id="sec5File" accept="image/*,audio/*,.doc,.docx,.pdf,.xlsx" onchange="handleMediaFile(this, 'sec5Preview')">
+                    </div>
+                    <button type="button" class="btn-mic" id="micBtn-sec5" onclick="toggleVoiceRecord('sec5', 'sec5Text', 'sec5Preview', 'micBtn-sec5')">
+                        <i class="fa-solid fa-microphone"></i> Дуу бичих
+                    </button>
+                    <div id="sec5Preview" class="media-preview"></div>
+                </div>
+                <button class="btn" onclick="saveMediaSection('sec-5', 'sec5Text', 'sec5Preview', 'sec5List', 'Эрсдэлт бүлгийн тэмдэглэл хадгалагдлаа!')">Хадгалах</button>
+                <div id="sec5List"></div>
+            </div>
+
+            <!-- 6. ХБХ-ТЭЙ ХҮҮХЭД -->
+            <div id="sec-6" class="section-pane">
+                <h2 class="title">🧩 ХБХ-тэй хүүхэд</h2>
+                <p class="subtitle">Тусгай хэрэгцээт боловсрол шаардлагатай хүүхдийн хөгжлийн хяналт.</p>
+                <div class="form-group">
+                    <label>Хүүхдийн явц & Зөвлөмж</label>
+                    <textarea id="sec6Text" rows="2" placeholder="ХБХ хүүхдийн хөгжлийн тэмдэглэл..."></textarea>
+                </div>
+                <div class="media-box">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label>Зураг / Файл оруулах</label>
+                        <input type="file" id="sec6File" accept="image/*,audio/*,.doc,.docx,.pdf,.xlsx" onchange="handleMediaFile(this, 'sec6Preview')">
+                    </div>
+                    <button type="button" class="btn-mic" id="micBtn-sec6" onclick="toggleVoiceRecord('sec6', 'sec6Text', 'sec6Preview', 'micBtn-sec6')">
+                        <i class="fa-solid fa-microphone"></i> Дуу бичих
+                    </button>
+                    <div id="sec6Preview" class="media-preview"></div>
+                </div>
+                <button class="btn" onclick="saveMediaSection('sec-6', 'sec6Text', 'sec6Preview', 'sec6List', 'ХБХ хүүхдийн тэмдэглэл хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <div id="sec6List"></div>
+            </div>
+
+            <!-- 7. ЦЭЦЭРЛЭГИЙН ХЯНАЛТ -->
+            <div id="sec-7" class="section-pane">
+                <h2 class="title">🛡️ Цэцэрлэгийн хяналт</h2>
+                <p class="subtitle">Дотоод хяналт, Архив, Хүний нөөц, ХАБЭА, Ёс зүй, Дэмжлэгийн баг.</p>
+                <div class="form-group"><label>Хяналтын чиглэл сонгох</label>
+                    <select><option>Дотоод хяналт</option><option>Архив</option><option>Хүний нөөц</option><option>ХАБЭА</option><option>Ёс зүй</option><option>Дэмжлэгийн баг</option></select>
+                </div>
+                <div class="form-group"><label>Шалгалт, тайлангийн тэмдэглэл</label><textarea rows="3" placeholder="Хяналтын дүгнэлт..."></textarea></div>
+                <div class="form-group"><label>Файл / Зураг оруулах</label><input type="file" accept="image/*,.doc,.docx,.pdf,.xlsx"></div>
+                <button class="btn" onclick="alert('✨ Хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 8. ХООЛ ҮЙЛДВЭРЛЭЛ -->
+            <div id="sec-8" class="section-pane">
+                <h2 class="title">🍲 Хоол үйлдвэрлэл</h2>
+                <p class="subtitle">Хоолны 7 хоногийн төлөвлөгөө шалгах, өдрийн хоолонд зөвлөгөө өгөх.</p>
+                <div class="form-group">
+                    <label>Арга зүйчийн зөвлөмж / Санал бичих</label>
+                    <textarea id="sec8Text" rows="2" placeholder="Хоолны чанар дээр өгөх чиглэл..."></textarea>
+                </div>
+                <div class="media-box">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label>Зураг / Файл оруулах</label>
+                        <input type="file" id="sec8File" accept="image/*,audio/*,.doc,.docx,.pdf,.xlsx" onchange="handleMediaFile(this, 'sec8Preview')">
+                    </div>
+                    <button type="button" class="btn-mic" id="micBtn-sec8" onclick="toggleVoiceRecord('sec8', 'sec8Text', 'sec8Preview', 'micBtn-sec8')">
+                        <i class="fa-solid fa-microphone"></i> Дуу бичих
+                    </button>
+                    <div id="sec8Preview" class="media-preview"></div>
+                </div>
+                <button class="btn" onclick="saveMediaSection('sec-8', 'sec8Text', 'sec8Preview', 'sec8List', 'Хоол үйлдвэрлэлийн зөвлөмж хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <div id="sec8List"></div>
+            </div>
+
+            <!-- 9. ЭМЧ ЗӨВЛӨЖ БАЙНА -->
+            <div id="sec-9" class="section-pane">
+                <h2 class="title">🩺 Эмч зөвлөж байна</h2>
+                <p class="subtitle">Эрүүл мэндийн зөвлөмж, урьдчилан сэргийлэх арга хэмжээ, судалгаа хянах.</p>
+                <div class="form-group"><label>Эмчийн мэдээлэлд санал, чиглэл өгөх</label><textarea rows="2" placeholder="Чиглэл бичих..."></textarea></div>
+                <button class="btn" onclick="alert('✨ Илгээгдлээ!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+            </div>
+
+            <!-- 10. ТАЙЛАН (9–5 САР) -->
+            <div id="sec-10" class="section-pane">
+                <h2 class="title">📈 Тайлан (9–5 дугаар сар)</h2>
+                <p class="subtitle">Арга зүйчийн тайлан илгээх болон албан хаагчдын тайланг хянах, батлах.</p>
+
+                <h3 class="sub-heading">📤 Арга зүйчийн тайлан илгээх</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Тайлангийн сар</label>
+                        <select id="reportMonth">
+                            <option>9 дүгээр сар</option>
+                            <option>10 дугаар сар</option>
+                            <option>11 дүгээр сар</option>
+                            <option>12 дугаар сар</option>
+                            <option>1 дүгээр сар</option>
+                            <option>2 дугаар сар</option>
+                            <option>3 дугаар сар</option>
+                            <option>4 дүгээр сар</option>
+                            <option>5 дугаар сар</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Тайлангийн гарчиг</label>
+                        <input type="text" id="reportTitle" placeholder="Жишээ: Арга зүйн ажлын сарын тайлан">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Тайлангийн агуулга</label>
+                    <textarea id="reportBody" rows="3" placeholder="Хийгдсэн ажлууд, үр дүн, цаашдын зорилт..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Тайлангийн файл / Зураг хавсаргах</label>
+                    <input type="file" id="reportFile" accept="image/*,.doc,.docx,.pdf,.xlsx">
+                </div>
+                <button class="btn" onclick="submitMethodologistReport()"><i class="fa-solid fa-paper-plane"></i> Тайлан илгээх</button>
+
+                <h3 class="sub-heading">📋 Ирсэн болон илгээсэн тайлангууд</h3>
+                <table>
+                    <thead><tr><th>Зохиогч</th><th>Тайлангийн нэр</th><th>Хавсралт</th><th>Төлөв</th><th>Үйлдэл</th></tr></thead>
+                    <tbody id="reportsTbody">
+                        <tr>
+                            <td>Д.Батбаяр</td>
+                            <td>9 дүгээр сарын тайлан</td>
+                            <td>-</td>
+                            <td><b style="color:#0984e3;">Хянуулахаар ирсэн</b></td>
+                            <td><button class="btn" style="padding:3px 6px;" onclick="this.closest('tr').querySelector('td:nth-child(4)').innerHTML='<b style=\'color:#00b894;\'>Батлагдсан</b>'; alert('✅ Батлагдлаа')">Батлах</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 11. ДААЛГАВАР САН -->
+            <div id="sec-11" class="section-pane">
+                <h2 class="title">📋 Даалгавар сан</h2>
+                <p class="subtitle">Удирдлагаас өгөх болон гүйцэтгэх ажлуудын сан (зураг, файл, дуу бичлэгтэй).</p>
+                <div class="form-group">
+                    <label>Шинэ даалгавар өгөх</label>
+                    <textarea id="sec11Text" rows="2" placeholder="Даалгаврын утга..."></textarea>
+                </div>
+                <div class="media-box">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label>Зураг / Файл оруулах</label>
+                        <input type="file" id="sec11File" accept="image/*,audio/*,.doc,.docx,.pdf,.xlsx" onchange="handleMediaFile(this, 'sec11Preview')">
+                    </div>
+                    <button type="button" class="btn-mic" id="micBtn-sec11" onclick="toggleVoiceRecord('sec11', 'sec11Text', 'sec11Preview', 'micBtn-sec11')">
+                        <i class="fa-solid fa-microphone"></i> Дуу бичих
+                    </button>
+                    <div id="sec11Preview" class="media-preview"></div>
+                </div>
+                <button class="btn" onclick="saveMediaSection('sec-11', 'sec11Text', 'sec11Preview', 'sec11List', 'Даалгавар санд нэмэгдлээ!')">Өгөх</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <div id="sec11List"></div>
+            </div>
+
+            <!-- 12. КӨҮЧ АРГА ЗҮЙЧ -->
+            <div id="sec-12" class="section-pane">
+                <h2 class="title">🎯 КӨҮЧ арга зүйч (Хичээл ажиглалт)</h2>
+                <p class="subtitle">Багшийн хичээлд суусан тэмдэглэл, арга зүйн зөвлөмж өгөх.</p>
+                <div class="form-grid">
+                    <div class="form-group"><label>Багш сонгох</label><select><option>Д.Батбаяр (Пороро бүлэг)</option></select></div>
+                    <div class="form-group"><label>Огноо</label><input type="date"></div>
+                </div>
+                <div class="form-group"><label>Хичээлийн сэдэв & Ажигласан тэмдэглэл</label><textarea rows="3" placeholder="Багшийн арга зүй, хүүхдийн оролцоо..."></textarea></div>
+                <div class="form-group"><label>Файл / Зураг / Дуу бичлэг оруулах</label><input type="file" accept="image/*,.doc,.docx,.pdf,audio/*"></div>
+                <button class="btn" onclick="alert('✨ Багшид амжилттай илгээгдлээ!')">Багшид илгээх</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 13. АРГА ЗҮЙЧИЙН ӨӨРИЙН ХӨГЖИЛ -->
+            <div id="sec-13" class="section-pane">
+                <h2 class="title">🌱 Арга зүйчийн өөрийн хөгжил</h2>
+                <p class="subtitle">Сургалт, мэргэжлийн уншлага, өөрийн ажиглалт ба туршлага солилцох.</p>
+                <div class="form-group"><label>Гарчиг & Тэмдэглэл</label><input type="text" placeholder="Гарчиг"><textarea rows="3" placeholder="Өөрийн хөгжлийн тэмдэглэл..."></textarea></div>
+                <div class="form-group"><label>Зураг, дуу хоолой, файл оруулах</label><input type="file" accept="image/*,audio/*,.doc,.docx,.pdf"></div>
+                <button class="btn" onclick="alert('✨ Хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn" style="background:#0984e3;" onclick="alert('📤 Илгээгдлээ!')">Илгээх</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 14. СУРГУУЛЬД БЭЛТГЭГДСЭН БАЙДАЛ -->
+            <div id="sec-14" class="section-pane">
+                <h2 class="title">🎓 Сургуульд бэлтгэгдсэн байдал</h2>
+                <p class="subtitle">Бэлтгэл бүлгийн хүүхдийн үнэлгээ, автомат тайлан.</p>
+                <div class="form-group"><label>Үнэлгээний тайлан файл хавсаргах</label><input type="file" accept=".doc,.docx,.pdf,.xlsx"></div>
+                <button class="btn" onclick="alert('✨ Автомат тайлан үүслээ!')">Тайлан боловсруулах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+            </div>
+
+            <!-- 15. ХУВИЙН ТОХИРГОО -->
+            <div id="sec-15" class="section-pane">
+                <h2 class="title">⚙️ Хувийн тохиргоо</h2>
+                <p class="subtitle">Арга зүйчийн хувийн мэдээлэл, боловсрол, мэргэжлийн мэдээлэл.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Овог, нэр</label>
+                        <input type="text" id="profName" placeholder="Жишээ: С.Оюунчимэг">
+                    </div>
+                    <div class="form-group">
+                        <label>Утасны дугаар</label>
+                        <input type="text" id="profPhone" placeholder="99223344">
+                    </div>
+                    <div class="form-group">
+                        <label>Мэйл хаяг (Gmail)</label>
+                        <input type="email" id="profEmail" placeholder="argazuich@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Төгссөн сургууль</label>
+                        <input type="text" id="profSchool" placeholder="Жишээ: МУБИС">
+                    </div>
+                    <div class="form-group">
+                        <label>Мэргэжил</label>
+                        <input type="text" id="profMajor" placeholder="Жишээ: Сургуулийн өмнөх боловсролын арга зүйч">
+                    </div>
+                    <div class="form-group">
+                        <label>Боловсролын зэрэг / Ажилласан жил</label>
+                        <input type="text" id="profDegree" placeholder="Жишээ: Бакалавр / 12 жил">
+                    </div>
+                </div>
+                <button class="btn" onclick="saveMethodologistProfile()"><i class="fa-solid fa-floppy-disk"></i> Хадгалах</button>
+                <div id="profSavedSummary" style="margin-top:15px; font-size:12px; color:#00695c;"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function switchSection(sectionId, btnElement) {
+            document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        // Түр хадгалах зураг / файл / дуу бичлэгийн өгөгдөл
+        const pendingAttachments = {
+            'sec5': { fileName: '', imageData: '', audioData: '' },
+            'sec6': { fileName: '', imageData: '', audioData: '' },
+            'sec8': { fileName: '', imageData: '', audioData: '' },
+            'sec11': { fileName: '', imageData: '', audioData: '' }
+        };
+
+        function handleMediaFile(inputEl, previewId) {
+            const file = inputEl.files && inputEl.files[0];
+            const sectionKey = inputEl.id.replace('File', '');
+            const previewEl = document.getElementById(previewId);
+            if (!file) return;
+
+            pendingAttachments[sectionKey].fileName = file.name;
+            const isImage = file.type.startsWith('image/');
+            const isAudio = file.type.startsWith('audio/');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                if (isImage) {
+                    pendingAttachments[sectionKey].imageData = dataUrl;
+                } else if (isAudio) {
+                    pendingAttachments[sectionKey].audioData = dataUrl;
+                }
+                renderMediaPreview(sectionKey, previewId);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderMediaPreview(sectionKey, previewId) {
+            const att = pendingAttachments[sectionKey];
+            const el = document.getElementById(previewId);
+            if (!el || !att) return;
+
+            let html = '';
+            if (att.fileName) {
+                html += `<div>📎 Хавсаргасан файл: <b>${escapeHtml(att.fileName)}</b></div>`;
+            }
+            if (att.imageData) {
+                html += `<img src="${att.imageData}" alt="Зураг">`;
+            }
+            if (att.audioData) {
+                html += `<audio controls src="${att.audioData}"></audio>`;
+            }
+            el.innerHTML = html;
+        }
+
+        // Дуу бичих (MediaRecorder + SpeechRecognition fallback)
+        const activeRecorders = {};
+
+        async function toggleVoiceRecord(sectionKey, textareaId, previewId, btnId) {
+            const btn = document.getElementById(btnId);
+            const textarea = document.getElementById(textareaId);
+
+            if (activeRecorders[sectionKey]) {
+                activeRecorders[sectionKey].stop();
+                return;
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Таны хөтөч дуу бичлэгийг дэмжихгүй байна. Аудио файл хавсаргаж болно.');
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const recorder = new MediaRecorder(stream);
+                const chunks = [];
+
+                // Монгол хэл дээр яриаг текст болгох оролдлого (хэрэв хөтөч дэмждэг бол)
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                let recognition = null;
+                if (SpeechRecognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.lang = 'mn-MN';
+                    recognition.interimResults = false;
+                    recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        if (textarea && transcript) {
+                            textarea.value = textarea.value ? `${textarea.value} ${transcript}` : transcript;
+                        }
+                    };
+                    try { recognition.start(); } catch (_) {}
+                }
+
+                recorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
+
+                recorder.onstop = () => {
+                    stream.getTracks().forEach(t => t.stop());
+                    if (recognition) {
+                        try { recognition.stop(); } catch (_) {}
+                    }
+                    const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        pendingAttachments[sectionKey].audioData = ev.target.result;
+                        if (!pendingAttachments[sectionKey].fileName) {
+                            pendingAttachments[sectionKey].fileName = 'voice_note.webm';
+                        }
+                        renderMediaPreview(sectionKey, previewId);
+                    };
+                    reader.readAsDataURL(blob);
+
+                    delete activeRecorders[sectionKey];
+                    if (btn) {
+                        btn.classList.remove('recording');
+                        btn.innerHTML = '<i class="fa-solid fa-microphone"></i> Дуу бичих';
+                    }
+                };
+
+                recorder.start();
+                activeRecorders[sectionKey] = recorder;
+                if (btn) {
+                    btn.classList.add('recording');
+                    btn.innerHTML = '<i class="fa-solid fa-stop"></i> Бичлэг зогсоох';
+                }
+            } catch (err) {
+                alert('Микрофон ашиглах зөвшөөрөл өгнө үү эсвэл аудио файл сонгоно уу.');
+            }
+        }
+
+        function saveMediaSection(sectionId, textareaId, previewId, listContainerId, successMsg) {
+            const textEl = document.getElementById(textareaId);
+            const text = textEl ? textEl.value.trim() : '';
+            const key = sectionId.replace('-', '');
+            const att = pendingAttachments[key] || { fileName: '', imageData: '', audioData: '' };
+
+            if (!text && !att.fileName && !att.imageData && !att.audioData) {
+                alert('Тэмдэглэл бичих эсвэл зураг/файл/дуу бичлэг оруулна уу!');
+                return;
+            }
+
+            if (typeof SharedStore !== 'undefined') {
+                SharedStore.update((store) => {
+                    if (!store.methodologistLogs) store.methodologistLogs = [];
+                    store.methodologistLogs.unshift({
+                        id: Date.now(),
+                        sectionId,
+                        text,
+                        fileName: att.fileName,
+                        imageData: att.imageData,
+                        audioData: att.audioData,
+                        date: typeof nowFormatted === 'function' ? nowFormatted() : new Date().toLocaleString()
+                    });
+                });
+            }
+
+            if (textEl) textEl.value = '';
+            const fileInput = document.getElementById(key + 'File');
+            if (fileInput) fileInput.value = '';
+            pendingAttachments[key] = { fileName: '', imageData: '', audioData: '' };
+            const prevEl = document.getElementById(previewId);
+            if (prevEl) prevEl.innerHTML = '';
+
+            renderMethodologistLogs();
+            alert('✨ ' + successMsg);
+        }
+
+        function renderMethodologistLogs() {
+            if (typeof SharedStore === 'undefined') return;
+            const store = SharedStore.get();
+            const logs = store.methodologistLogs || [];
+
+            const map = {
+                'sec-5': 'sec5List',
+                'sec-6': 'sec6List',
+                'sec-8': 'sec8List',
+                'sec-11': 'sec11List'
+            };
+
+            Object.entries(map).forEach(([secId, containerId]) => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const items = logs.filter(x => x.sectionId === secId);
+                if (!items.length) {
+                    container.innerHTML = '';
+                    return;
+                }
+                container.innerHTML = `
+                    <h3 class="sub-heading">Хадгалагдсан тэмдэглэлүүд</h3>
+                    ${items.map(item => `
+                        <div class="media-box">
+                            <div style="font-size:10px; color:#747d8c; margin-bottom:4px;">🕒 ${escapeHtml(item.date)}</div>
+                            ${item.text ? `<div style="font-size:12px; margin-bottom:6px;">${escapeHtml(item.text)}</div>` : ''}
+                            ${item.fileName ? `<div style="font-size:11px; color:#00796b;">📎 ${escapeHtml(item.fileName)}</div>` : ''}
+                            ${item.imageData ? `<img src="${item.imageData}" style="max-width:180px; border-radius:8px; margin-top:6px; display:block;">` : ''}
+                            ${item.audioData ? `<audio controls src="${item.audioData}" style="width:100%; max-width:340px; margin-top:6px; display:block;"></audio>` : ''}
+                        </div>
+                    `).join('')}
+                `;
+            });
+        }
+
+        // 10. Арга зүйчийн тайлан илгээх
+        function submitMethodologistReport() {
+            const month = document.getElementById('reportMonth')?.value || '';
+            const title = document.getElementById('reportTitle')?.value.trim() || '';
+            const body = document.getElementById('reportBody')?.value.trim() || '';
+            const fileInput = document.getElementById('reportFile');
+            const fileName = (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0].name : '';
+
+            if (!title && !body && !fileName) {
+                alert('Тайлангийн гарчиг, агуулга эсвэл файл оруулна уу!');
+                return;
+            }
+
+            const profile = (typeof SharedStore !== 'undefined' && SharedStore.get().methodologistProfile) || {};
+            const authorName = profile.name ? `${profile.name} (Арга зүйч)` : 'Арга зүйч';
+            const fullTitle = `[${month}] ${title || 'Арга зүйн тайлан'}`;
+
+            if (typeof SharedStore !== 'undefined') {
+                SharedStore.update((store) => {
+                    if (!store.methodologistReports) store.methodologistReports = [];
+                    store.methodologistReports.unshift({
+                        id: Date.now(),
+                        author: authorName,
+                        title: fullTitle,
+                        body,
+                        fileName,
+                        status: 'Илгээсэн',
+                        date: typeof nowFormatted === 'function' ? nowFormatted() : new Date().toLocaleString()
+                    });
+                });
+            }
+
+            if (document.getElementById('reportTitle')) document.getElementById('reportTitle').value = '';
+            if (document.getElementById('reportBody')) document.getElementById('reportBody').value = '';
+            if (fileInput) fileInput.value = '';
+
+            renderMethodologistReports();
+            alert('📤 Тайлан амжилттай илгээгдлээ!');
+        }
+
+        function renderMethodologistReports() {
+            const tbody = document.getElementById('reportsTbody');
+            if (!tbody || typeof SharedStore === 'undefined') return;
+            const store = SharedStore.get();
+            const sentReports = store.methodologistReports || [];
+
+            const defaultRow = `
+                <tr>
+                    <td>Д.Батбаяр</td>
+                    <td>9 дүгээр сарын тайлан</td>
+                    <td>-</td>
+                    <td><b style="color:#0984e3;">Хянуулахаар ирсэн</b></td>
+                    <td><button class="btn" style="padding:3px 6px;" onclick="this.closest('tr').querySelector('td:nth-child(4)').innerHTML='<b style=\\'color:#00b894;\\'>Батлагдсан</b>'; alert('✅ Батлагдлаа')">Батлах</button></td>
+                </tr>
+            `;
+
+            const customRows = sentReports.map(r => `
+                <tr>
+                    <td><b>${escapeHtml(r.author)}</b></td>
+                    <td>${escapeHtml(r.title)}${r.body ? `<br><span style="color:#57606f;">${escapeHtml(r.body)}</span>` : ''}</td>
+                    <td>${r.fileName ? `📎 ${escapeHtml(r.fileName)}` : '-'}</td>
+                    <td><b style="color:#00b894;">${escapeHtml(r.status)}</b></td>
+                    <td><span style="font-size:10px; color:#747d8c;">${escapeHtml(r.date)}</span></td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = customRows + defaultRow;
+        }
+
+        // 15. Хувийн тохиргоо хадгалах / унших
+        function saveMethodologistProfile() {
+            const profile = {
+                name: document.getElementById('profName')?.value.trim() || '',
+                phone: document.getElementById('profPhone')?.value.trim() || '',
+                email: document.getElementById('profEmail')?.value.trim() || '',
+                school: document.getElementById('profSchool')?.value.trim() || '',
+                major: document.getElementById('profMajor')?.value.trim() || '',
+                degree: document.getElementById('profDegree')?.value.trim() || ''
+            };
+
+            if (typeof SharedStore !== 'undefined') {
+                SharedStore.update((store) => {
+                    store.methodologistProfile = profile;
+                });
+            }
+
+            applyMethodologistProfile(profile);
+            alert('✨ Хувийн тохиргоо амжилттай хадгалагдлаа!');
+        }
+
+        function applyMethodologistProfile(profile) {
+            if (!profile) return;
+            if (document.getElementById('profName')) document.getElementById('profName').value = profile.name || '';
+            if (document.getElementById('profPhone')) document.getElementById('profPhone').value = profile.phone || '';
+            if (document.getElementById('profEmail')) document.getElementById('profEmail').value = profile.email || '';
+            if (document.getElementById('profSchool')) document.getElementById('profSchool').value = profile.school || '';
+            if (document.getElementById('profMajor')) document.getElementById('profMajor').value = profile.major || '';
+            if (document.getElementById('profDegree')) document.getElementById('profDegree').value = profile.degree || '';
+
+            const sidebarName = document.getElementById('sidebarMethodologistName');
+            if (sidebarName) {
+                sidebarName.textContent = profile.name ? `${profile.name} • Арга зүйч` : 'Арга зүйч';
+            }
+
+            const summary = document.getElementById('profSavedSummary');
+            if (summary && (profile.name || profile.school || profile.major)) {
+                summary.innerHTML = `
+                    <b>Хадгалагдсан мэдээлэл:</b>
+                    ${escapeHtml(profile.name || '-')} | Утас: ${escapeHtml(profile.phone || '-')} | Мэйл: ${escapeHtml(profile.email || '-')} |
+                    Сургууль: ${escapeHtml(profile.school || '-')} | Мэргэжил: ${escapeHtml(profile.major || '-')} ${profile.degree ? `(${escapeHtml(profile.degree)})` : ''}
+                `;
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[m]));
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof SharedStore !== 'undefined') {
+                const store = SharedStore.get();
+                applyMethodologistProfile(store.methodologistProfile);
+                SharedStore.onChange((updated) => {
+                    applyMethodologistProfile(updated.methodologistProfile);
+                    renderMethodologistLogs();
+                    renderMethodologistReports();
+                });
+            }
+            renderMethodologistLogs();
+            renderMethodologistReports();
+        });
+    </script>
+</body>
+</html>

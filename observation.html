@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Ажиглалт & Үнэлгээ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6b81;
+            --primary-hover: #ff4757;
+            --secondary-color: #2ed573;
+            --bg-gradient: linear-gradient(135deg, #fbc531 0%, #ff6b81 50%, #70a1ff 100%);
+            --card-bg: #ffffff;
+            --text-color: #2f3542;
+            --border-color: #ffdde1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Зүүн талын навигацийн цэс (Sidebar) */
+        aside {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px dashed var(--border-color);
+            background: #fff0f3;
+        }
+
+        .sidebar-header h2 {
+            font-size: 16px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .sidebar-menu {
+            padding: 15px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 6px;
+            border: 2px solid transparent;
+            background: #fff9fa;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #57606f;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            text-decoration: none;
+        }
+
+        .menu-btn:hover {
+            background: #ffeaa7;
+            color: #2f3542;
+            border-color: #fdcb6e;
+        }
+
+        .menu-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+
+        /* Баруун талын үндсэн контент */
+        main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 4px solid #fff;
+        }
+
+        h2.title {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #747d8c;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #57606f;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 13px;
+            background-color: #fff9fa;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(255, 107, 129, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        th, td {
+            border: 1px solid #dfe4ea;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #ffeaa7;
+            color: #2d3436;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { background-color: #26af5f; transform: translateY(-1px); }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+    </style>
+</head>
+<body>
+
+    <!-- ЗҮҮН ТАЛЫН ЦЭС -->
+    <aside>
+        <div>
+            <div class="sidebar-header">
+                <h2>👁️ Ажиглалтын Самбар</h2>
+                <p style="font-size: 11px; color: #747d8c;">Чандмань-Өндөр СӨБ</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="children.html" class="menu-btn"><i class="fa-solid fa-arrow-left"></i> Хүүхдийн жагсаалт руу буцах</a>
+                <a href="#" class="menu-btn active"><i class="fa-solid fa-eye"></i> Ажиглалт & Үнэлгээ бүртгэх</a>
+                <a href="erhlegch.html" class="menu-btn"><i class="fa-solid fa-crown"></i> Эрхлэгчийн самбар</a>
+            </div>
+        </div>
+
+        <div style="padding: 15px; border-top: 2px dashed var(--border-color); text-align: center;">
+            <a href="login.html" style="font-size: 12px; color: #ff4757; font-weight: bold; text-decoration: none;">🚪 Системээс гарах</a>
+        </div>
+    </aside>
+
+    <!-- БАРУУН ТАЛЫН ҮНДСЭН ХЭСЭГ -->
+    <main>
+        <div class="container">
+            <h2 class="title">🔍 Хүүхдийн Ажиглалт & Үнэлгээний Сан</h2>
+            <p class="subtitle">Багшийн өдөр тутмын тэмдэглэл, оноо болон хавсаргасан файл (Word/PDF) автоматаар огноотойгоор хадгалагдана.</p>
+            
+            <!-- БҮРТГЭХ ХЭСЭГ -->
+            <div style="background: #fff9fa; padding: 20px; border-radius: 20px; border: 2px solid var(--border-color); margin-bottom: 25px;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Хүүхдийн нэр</label>
+                        <select id="childName">
+                            <option>Тэмүүлэн Батбаяр (Пороро бүлэг)</option>
+                            <option>Амин-Эрдэнэ Номин (Маша бүлэг)</option>
+                            <option>Мөнх-Эгшиглэн Төгөлдөр (Бяцхан од)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Өдрийн оноо</label>
+                        <select id="childScore">
+                            <option value="10 оноо (Маш сайн 🌟)">10 оноо (Маш сайн 🌟)</option>
+                            <option value="9 оноо (Сайн 👍)">9 оноо (Сайн 👍)</option>
+                            <option value="8 оноо (Дунд 📚)">8 оноо (Дунд 📚)</option>
+                            <option value="7 оноо болон доош (Анхаарах 📌)">7 оноо болон доош (Анхаарах 📌)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ажиглалтын чиглэл</label>
+                        <input type="text" id="obsCategory" placeholder="Жишээ нь: Нийгэмшихүй / Хэл яриа">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Багшийн дүгнэлт & Өдрийн тэмдэглэл</label>
+                    <textarea id="obsConclusion" rows="3" placeholder="Хүүхдийн тухайн өдрийн идэвх оролцоо, хөгжлийн ахицыг дэлгэрэнгүй бичих..."></textarea>
+                </div>
+
+                <div class="form-grid" style="align-items: center;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Файл хавсаргах (Word / PDF / Зураг)</label>
+                        <input type="file" id="obsFile" accept=".doc,.docx,.pdf,image/*" style="padding: 7px; background: #fff;">
+                    </div>
+                    <div style="text-align: right; padding-top: 15px;">
+                        <button class="btn btn-primary" onclick="saveObservation()">
+                            <i class="fa-solid fa-floppy-disk"></i> Ажиглалт хадгалах
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ХАДГАЛАГДСАН ТҮҮХ -->
+            <h3 style="font-size: 16px; color: #2f3542; margin-bottom: 10px;"><i class="fa-solid fa-clock-rotate-left"></i> Хадгалагдсан ажиглалтын түүх</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Огноо, Цаг (Автомат)</th>
+                            <th>Хүүхдийн нэр</th>
+                            <th>Оноо & Чиглэл</th>
+                            <th>Дүгнэлт / Тэмдэглэл</th>
+                            <th>Хавсаргасан файл</th>
+                        </tr>
+                    </thead>
+                    <tbody id="observationTable">
+                        <tr>
+                            <td style="font-size: 11px; font-weight: bold; color: #0984e3;">2026-11-17 14:30</td>
+                            <td><b>Тэмүүлэн Батбаяр</b></td>
+                            <td><b>10 оноо</b><br><span style="font-size: 11px; color: #636e72;">Хэл яриа</span></td>
+                            <td>Өөрийн санааг маш баялаг үгсийн сангаар чөлөөтэй илэрхийлж байна.</td>
+                            <td><a href="#" style="color: #0984e3; font-weight: bold;"><i class="fa-solid fa-file-pdf"></i> Temuulen_ajiglal.pdf</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function saveObservation() {
+            const child = document.getElementById('childName').value;
+            const score = document.getElementById('childScore').value;
+            const category = document.getElementById('obsCategory').value.trim();
+            const conclusion = document.getElementById('obsConclusion').value.trim();
+            const fileInput = document.getElementById('obsFile');
+            
+            if(!conclusion) {
+                alert("Багшийн дүгнэлт, тэмдэглэлийг заавал бичнэ үү!");
+                return;
+            }
+
+            // Файлын нэр авах (Файл сонгосон эсэхийг шалгах)
+            const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "Файл хавсаргаагүй";
+
+            // Автоматаар огноо, цаг үүсгэх (YYYY-MM-DD HH:MM)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const dateTimeStr = `${year}-${month}-${day} ${hours}:${minutes}`;
+
+            // Хүснэгтэд шинэ мөр нэмэх
+            const tbody = document.getElementById('observationTable');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="font-size: 11px; font-weight: bold; color: #0984e3;">${dateTimeStr}</td>
+                <td><b>${child}</b></td>
+                <td><b>${score}</b><br><span style="font-size: 11px; color: #636e72;">${category || 'Ерөнхий'}</span></td>
+                <td>${conclusion}</td>
+                <td><span style="color: #2d3436; font-weight: bold;"><i class="fa-solid fa-file-lines" style="color: #00b894;"></i> ${fileName}</span></td>
+            `;
+            tbody.prepend(row);
+
+            // Формоо цэвэрлэх
+            document.getElementById('obsCategory').value = '';
+            document.getElementById('obsConclusion').value = '';
+            fileInput.value = '';
+
+            alert("✨ Ажиглалт, оноо болон хавсаргасан файл огноотойгоор амжилттай хадгалагдлаа!");
+        }
+    </script>
+</body>
+</html>

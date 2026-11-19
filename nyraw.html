@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Няравын Самбар</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6b81;
+            --primary-hover: #ff4757;
+            --secondary-color: #2ed573;
+            --bg-gradient: linear-gradient(135deg, #fbc531 0%, #ff6b81 50%, #70a1ff 100%);
+            --card-bg: #ffffff;
+            --text-color: #2f3542;
+            --border-color: #ffdde1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Зүүн талын навигацийн цэс */
+        aside {
+            width: 290px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px dashed var(--border-color);
+            background: #fff0f3;
+        }
+
+        .sidebar-header h2 {
+            font-size: 15px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .sidebar-menu {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: calc(100vh - 130px);
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 9px 12px;
+            margin-bottom: 5px;
+            border: 2px solid transparent;
+            background: #fff9fa;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #57606f;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .menu-btn:hover {
+            background: #ffeaa7;
+            color: #2f3542;
+            border-color: #fdcb6e;
+        }
+
+        .menu-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+
+        /* Баруун талын үндсэн контент */
+        main {
+            flex: 1;
+            margin-left: 290px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 4px solid #fff;
+        }
+
+        .section-pane { display: none; }
+        .section-pane.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.title {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 22px;
+        }
+
+        .subtitle {
+            color: #747d8c;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #57606f;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 13px;
+            background-color: #fff9fa;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(255, 107, 129, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        th, td {
+            border: 1px solid #dfe4ea;
+            padding: 10px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #ffeaa7;
+            color: #2d3436;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn:hover { background-color: #26af5f; transform: translateY(-1px); }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-export {
+            background-color: #0984e3;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
+        }
+        .btn-export:hover { background-color: #74b9ff; }
+
+        .btn-danger {
+            background-color: #ff4757;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+        }
+        .btn-danger:hover { background-color: #ff6b81; }
+
+        .btn-mic {
+            background-color: #ffa502;
+            box-shadow: 0 4px 10px rgba(255, 165, 2, 0.3);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .btn-mic:hover { background-color: #ff9f1a; }
+
+        .alert-box {
+            background: #fff0f3;
+            border-left: 4px solid var(--primary-color);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ЗҮҮН ТАЛЫН НАВИГАЦИЙН ЦЭС -->
+    <aside>
+        <div>
+            <div class="sidebar-header">
+                <h2>📦 Няравын Самбар</h2>
+                <p style="font-size: 11px; color: #747d8c;">Чандмань-Өндөр СӨБ</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <button class="menu-btn active" onclick="switchSection('sec-1', this)"><i class="fa-solid fa-house"></i> 1. Нүүр хэсэг</button>
+                <button class="menu-btn" onclick="switchSection('sec-2', this)"><i class="fa-solid fa-boxes-stacked"></i> 2. Бараа материал бүртгэл</button>
+                <button class="menu-btn" onclick="switchSection('sec-3', this)"><i class="fa-solid fa-truck-ramp-box"></i> 3. Нийлүүлэгч & Захиалга</button>
+                <button class="menu-btn" onclick="switchSection('sec-4', this)"><i class="fa-solid fa-warehouse"></i> 4. Агуулахын үлдэгдэл</button>
+                <button class="menu-btn" onclick="switchSection('sec-5', this)"><i class="fa-solid fa-file-invoice-dollar"></i> 5. Орлого, зарлага</button>
+                <button class="menu-btn" onclick="switchSection('sec-6', this)"><i class="fa-solid fa-utensils"></i> 6. Тогоочийн захиалга</button>
+                <button class="menu-btn" onclick="switchSection('sec-7', this)"><i class="fa-solid fa-chart-pie"></i> 7. Тайлан</button>
+                <button class="menu-btn" onclick="switchSection('sec-8', this)"><i class="fa-solid fa-clipboard-user"></i> 8. Өдөр тутмын ирц</button>
+                <button class="menu-btn" onclick="switchSection('sec-9', this)"><i class="fa-solid fa-stethoscope"></i> 9. Эмчтэй холбогдох</button>
+                <button class="menu-btn" onclick="switchSection('sec-10', this)"><i class="fa-solid fa-triangle-exclamation"></i> 10. Харшлын мэдээлэл</button>
+                <button class="menu-btn" onclick="switchSection('sec-11', this)"><i class="fa-solid fa-lightbulb"></i> 11. Зөвлөмж</button>
+            </div>
+        </div>
+
+        <div style="padding: 12px; border-top: 2px dashed var(--border-color); text-align: center;">
+            <a href="login.html" style="font-size: 12px; color: #ff4757; font-weight: bold; text-decoration: none;">🚪 Системээс гарах</a>
+            <div class="sidebar-menu">
+    <a href="erhlegch.html" class="menu-btn"><i class="fa-solid fa-crown"></i> Эрхлэгчийн самбар</a>
+    <a href="teacher.html" class="menu-btn"><i class="fa-solid fa-chalkboard-user"></i> Бүлгийн багш</a>
+    <a href="tamir-teacher.html" class="menu-btn"><i class="fa-solid fa-person-running"></i> Биеийн тамирын багш</a>
+    <a href="music-teacher.html" class="menu-btn"><i class="fa-solid fa-music"></i> Дуу хөгжмийн багш</a>
+    <a href="togooch.html" class="menu-btn"><i class="fa-solid fa-utensils"></i> Тогоочийн самбар</a>
+    <a href="nyraw.html" class="menu-btn"><i class="fa-solid fa-boxes-stacked"></i> Няравын самбар</a>
+    <a href="parent.html" class="menu-btn"><i class="fa-solid fa-child-reaching"></i> Эцэг эхийн самбар</a>
+    <a href="recommendations.html" class="menu-btn"><i class="fa-solid fa-bullhorn"></i> Зөвлөмж & Даалгавар</a>
+</div>
+        </div>
+    </aside>
+
+    <!-- БАРУУН ТАЛЫН ҮНДСЭН КОНТЕНТ ХЭСЭГ -->
+    <main>
+        <div class="container">
+
+            <!-- 1. НҮҮР ХЭСЭГ -->
+            <div id="sec-1" class="section-pane active">
+                <h2 class="title">🏠 Няравын нүүр хуудас</h2>
+                <p class="subtitle">Агуулах болон бараа материалын үндсэн хяналтын хэсэг.</p>
+                <div class="alert-box"><b>⚠️ Анхаарах зүйл:</b> Гурил болон будааны үлдэгдэл багассан тул шинэ захиалга шалгана уу.</div>
+            </div>
+
+            <!-- 2. БАРАА МАТЕРИАЛ БҮРТГЭЛ -->
+            <div id="sec-2" class="section-pane">
+                <h2 class="title">📦 Бараа материал бүртгэл</h2>
+                <p class="subtitle">Шинэ бараа бүртгэх, зураг/файл хавсаргах, дуу бичих, засах, устгах, татах.</p>
+                <div class="form-grid">
+                    <div class="form-group"><label>Барааны нэр</label><input type="text" placeholder="Жишээ: Дээд гурил"></div>
+                    <div class="form-group"><label>Тоо хэмжээ / Нэгж</label><input type="text" placeholder="50 уут"></div>
+                </div>
+                <div class="form-group"><label>Дэлгэрэнгүй тэмдэглэл</label><textarea rows="2" placeholder="Байршил, чанарын тухай..."></textarea></div>
+                <div class="form-group">
+                    <label>Дуу хоолойгоор оруулах (Voice)</label>
+                    <button class="btn-mic" onclick="alert('🔴 Микрофон асаж байна... Дуу бичиж байна.')"><i class="fa-solid fa-microphone"></i> Дуу бичих</button>
+                </div>
+                <div class="form-group"><label>Зураг / Файл хавсаргах</label><input type="file" accept="image/*,.doc,.docx,.pdf,audio/*"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Бараа амжилттай хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Word/PDF/Excel руу татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 3. НИЙЛҮҮЛЭГЧ & ЗАХИАЛГА -->
+            <div id="sec-3" class="section-pane">
+                <h2 class="title">🚚 Нийлүүлэгч & Захиалга</h2>
+                <p class="subtitle">Нийлүүлэгч байгууллагуудтай хийх захиалга, баримт бичиг бүртгэх.</p>
+                <div class="form-grid">
+                    <div class="form-group"><label>Нийлүүлэгч компани</label><input type="text" placeholder="Компанийн нэр"></div>
+                    <div class="form-group"><label>Захиалсан огноо</label><input type="date"></div>
+                </div>
+                <div class="form-group"><label>Захиалгын утга, тэмдэглэл</label><textarea rows="2" placeholder="Захиалгын дэлгэрэнгүй..."></textarea></div>
+                <div class="form-group">
+                    <label>Дуу хоолойгоор оруулах (Voice)</label>
+                    <button class="btn-mic" onclick="alert('🔴 Дуу бичиж байна...')"><i class="fa-solid fa-microphone"></i> Дуу бичих</button>
+                </div>
+                <div class="form-group"><label>Зураг / Файл хавсаргах</label><input type="file" accept="image/*,.doc,.docx,.pdf"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Захиалга хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 4. АГУУЛАХЫН ҮЛДЭГДЭЛ -->
+            <div id="sec-4" class="section-pane">
+                <h2 class="title">🏢 Агуулахын үлдэгдэл</h2>
+                <p class="subtitle">Агуулах дахь барааны үлдэгдлийг шалгах, засварлах, татах.</p>
+                <div class="form-group"><label>Үлдэгдлийн тэмдэглэл шинэчлэх</label><textarea rows="2" placeholder="Үлдэгдлийн байдал..."></textarea></div>
+                <div class="form-group">
+                    <label>Дуу хоолойгоор тэмдэглэх (Voice)</label>
+                    <button class="btn-mic" onclick="alert('🔴 Дуу бичиж байна...')"><i class="fa-solid fa-microphone"></i> Дуу бичих</button>
+                </div>
+                <div class="form-group"><label>Зураг / Файл оруулах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Шинэчлэгдлээ!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Тайлан татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 5. ОРЛОГО, ЗАРЛАГА -->
+            <div id="sec-5" class="section-pane">
+                <h2 class="title">📊 Орлого, зарлага</h2>
+                <p class="subtitle">Бараа материалын орлого, зарлагын хөдөлгөөнийг бүртгэх.</p>
+                <div class="form-grid">
+                    <div class="form-group"><label>Гүйлгээний утга</label><input type="text" placeholder="Махны орлого"></div>
+                    <div class="form-group"><label>Дүн / Тоо хэмжээ</label><input type="text" placeholder="100 кг"></div>
+                </div>
+                <div class="form-group"><label>Тэмдэглэл</label><textarea rows="2" placeholder="Дэлгэрэнгүй тайлбар..."></textarea></div>
+                <div class="form-group">
+                    <label>Дуу хоолойгоор оруулах (Voice)</label>
+                    <button class="btn-mic" onclick="alert('🔴 Дуу бичиж байна...')"><i class="fa-solid fa-microphone"></i> Дуу бичих</button>
+                </div>
+                <div class="form-group"><label>Баримт / Зураг хавсаргах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Орлого зарлага хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Тайлан татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 6. ТОГООЧИЙН ЗАХИАЛГА -->
+            <div id="sec-6" class="section-pane">
+                <h2 class="title">🥣 Тогоочийн захиалга хүлээн авах</h2>
+                <p class="subtitle">Тогоочоос ирсэн хүнсний захиалгыг шалгаж баталгаажуулах.</p>
+                <div class="form-group"><label>Захиалгын тэмдэглэл & Хариу бичих</label><textarea rows="2" placeholder="Батлах эсвэл засварлах тайлбар..."></textarea></div>
+                <div class="form-group">
+                    <label>Дуу хоолойгоор хариу өгөх (Voice)</label>
+                    <button class="btn-mic" onclick="alert('🔴 Дуу бичиж байна...')"><i class="fa-solid fa-microphone"></i> Дуу бичих</button>
+                </div>
+                <div class="form-group"><label>Файл / Зураг хавсаргах</label><input type="file" accept="image/*,.doc,.docx,.pdf,audio/*"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Захиалга баталгаажлаа!')">Батлах / Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Цуцлагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 7. ТАЙЛАН -->
+            <div id="sec-7" class="section-pane">
+                <h2 class="title">📈 Няравын тайлан</h2>
+                <p class="subtitle">Сар бүрийн агуулахын тайлан гаргах, файл хавсаргах.</p>
+                <div class="form-group"><label>Тайлангийн гарчиг</label><input type="text" placeholder="11 дүгээр сарын тайлан"></div>
+                <div class="form-group"><label>Тайлангийн утга, тэмдэглэл</label><textarea rows="3" placeholder="Дэлгэрэнгүй тайлан..."></textarea></div>
+                <div class="form-group">
+                    <label>Дуу хоолойгоор тайлан оруулах (Voice)</label>
+                    <button class="btn-mic" onclick="alert('🔴 Дуу бичиж байна...')"><i class="fa-solid fa-microphone"></i> Дуу бичих</button>
+                </div>
+                <div class="form-group"><label>Word, PDF, Excel файл эсвэл зураг хавсаргах</label><input type="file" accept="image/*,audio/*,.doc,.docx,.pdf"></div>
+                <button class="btn btn-primary" onclick="alert('🚀 Тайлан илгээгдлээ!')">Илгээх & Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Word/PDF/Excel руу татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 8. ӨДӨР ТУТМЫН ИРЦ -->
+            <div id="sec-8" class="section-pane">
+                <h2 class="title">📋 Өдөр тутмын ирц</h2>
+                <p class="subtitle">Цэцэрлэгийн нийт хүүхдийн ирцийн нэгтгэл (Хүнсний тооцоолол хийхэд ашиглана).</p>
+                <table>
+                    <thead><tr><th>Бүлэг</th><th>Ирсэн хүүхэд</th></tr></thead>
+                    <tbody><tr><td>Пороро бүлэг</td><td>25 хүүхэд</td></tr></tbody>
+                </table>
+            </div>
+
+            <!-- 9. ЭМЧТЭЙ ХОЛБОГДОХ -->
+            <div id="sec-9" class="section-pane">
+                <h2 class="title">🩺 Эмчтэй холбогдох</h2>
+                <p class="subtitle">Эрүүл ахуй, хүнсний чанар шалгалтын талаар эмчтэй харилцах.</p>
+                <div class="form-group"><label>Эмч рүү илгээх тэмдэглэл / Санал</label><textarea rows="2" placeholder="Тэмдэглэл бичих..."></textarea></div>
+                <div class="form-group">
+                    <label>Дуу хоолойгоор оруулах (Voice)</label>
+                    <button class="btn-mic" onclick="alert('🔴 Дуу бичиж байна...')"><i class="fa-solid fa-microphone"></i> Дуу бичих</button>
+                </div>
+                <div class="form-group"><label>Файл / Зураг хавсаргах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Илгээгдлээ!')">Илгээх</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 10. ХАРШЛЫН МЭДЭЭЛЭЛ -->
+            <div id="sec-10" class="section-pane">
+                <h2 class="title">⚠️ Харшлын мэдээлэл</h2>
+                <p class="subtitle">Хүүхдийн хоол хүнсний харшлын жагсаалт, няравын анхаарах зүйлс.</p>
+                <table>
+                    <thead><tr><th>Хүүхдийн нэр</th><th>Харшил үүсгэгч орц</th><th>Үйлдэл</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td>Б.Тэмүүлэн</td>
+                            <td>Өндөг, самар</td>
+                            <td>
+                                <button class="btn" style="padding:3px 6px; font-size:10px;">Засах</button>
+                                <button class="btn btn-danger" style="padding:3px 6px; font-size:10px;" onclick="this.parentNode.parentNode.remove()">Устгах</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="alert('➕ Шинэ харшлын мэдээлэл нэмэх')">Шинэ бүртгэл нэмэх</button>
+                    <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                </div>
+            </div>
+
+            <!-- 11. ЗӨВЛӨМЖ -->
+            <div id="sec-11" class="section-pane">
+                <h2 class="title">💡 Зөвлөмж</h2>
+                <p class="subtitle">Агуулахын хадгалалт, эрүүл ахуйн зөвлөмжүүдтэй танилцах болон санал оруулах.</p>
+                <div class="alert-box"><b>💡 Зөвлөмж:</b> Хүнсний бүтээгдэхүүнийг чийгшил багатай, сэрүүн орчинд хадгалах.</div>
+                <div class="form-group"><label>Өөрийн санаа, зөвлөмж нэмэх</label><textarea rows="2" placeholder="Санал бичих..."></textarea></div>
+                <div class="form-group">
+                    <label>Дуу хоолойгоор оруулах (Voice)</label>
+                    <button class="btn-mic" onclick="alert('🔴 Дуу бичиж байна...')"><i class="fa-solid fa-microphone"></i> Дуу бичих</button>
+                </div>
+                <div class="form-group"><label>Файл / Зураг хавсаргах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Зөвлөмж хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // nyraw.html доторх renderNyrawRequests() функц:
+function renderNyrawRequests() {
+  const store = SharedStore.get();
+  const sec6 = document.getElementById('sec-6');
+  if (!sec6) return;
+
+  let listEl = document.getElementById('nyrawIncomingList');
+  if (!listEl) {
+    listEl = document.createElement('div');
+    listEl.id = 'nyrawIncomingList';
+    listEl.style.marginTop = '15px';
+    sec6.appendChild(listEl);
+  }
+
+  listEl.innerHTML = `
+    <table>
+      <thead><tr><th>Огноо</th><th>Илгээгч</th><th>Захиалга</th><th>Төлөв</th><th>Үйлдэл</th></tr></thead>
+      <tbody>
+        ${store.inventoryRequests
+          .map(
+            (r) => `
+          <tr>
+            <td>${r.date}</td>
+            <td><b>${r.fromRole}</b></td>
+            <td>${r.itemsText}</td>
+            <td><b>${r.status === 'approved' ? '✅ Баталгаажсан' : '⏳ Хүлээгдэж буй'}</b></td>
+            <td>
+              <button class="btn" onclick="approveNyrawRequest(${r.id})">Батлах</button>
+            </td>
+          </tr>`
+          )
+          .join('')}
+      </tbody>
+    </table>`;
+}
+
+function approveNyrawRequest(reqId) {
+  SharedStore.update((store) => {
+    const req = store.inventoryRequests.find((r) => r.id === reqId);
+    if (req) req.status = 'approved';
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderNyrawRequests();
+  SharedStore.onChange(renderNyrawRequests);
+});
+        function switchSection(sectionId, btnElement) {
+            document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+    </script>
+</body>
+</html>

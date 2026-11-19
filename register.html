@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бүртгүүлэх - Чандмань-Өндөр СӨБ</title>
+    <!-- Google Fonts: Poppins & Nunito (хүүхэд багачууд, цэцэрлэгийн орчинд тохирсон цэвэрхэн фонт) -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome ไอкон -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 520px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Дээд хэсгийн чимэглэл өнгө */
+        .register-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #ff8a65, #ffd54f, #4db6ac, #64b5f6);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-section h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 10px;
+        }
+
+        .logo-section p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px 12px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #2d3748;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+        }
+
+        .form-control:focus {
+            border-color: #4db6ac;
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(77, 182, 172, 0.15);
+        }
+
+        select.form-control {
+            padding-left: 45px;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #26a69a, #00897b);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(38, 166, 154, 0.35);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #00897b, #00695c);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(38, 166, 154, 0.45);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .login-link a {
+            color: #00897b;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        <div class="logo-section">
+            <!-- Дүрслэл эсвэл лого байрлуулах хэсэг -->
+            <i class="fa-solid fa-child-reaching fa-3x" style="color: #ff8a65;"></i>
+            <h1>Чандмань-Өндөр СӨБ</h1>
+            <p>Шинэ хэрэглэгчийн бүртгэл үүсгэх</p>
+        </div>
+
+        <form action="#" method="POST">
+            <!-- Хэрэглэгчийн үүрэг сонгох -->
+            <div class="form-group">
+                <label for="role">Таны эрх / Үүрэг</label>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-user-tag"></i>
+                    <select id="role" class="form-control" required>
+                        <option value="" disabled selected>Үүргээ сонгоно уу</option>
+                        <option value="parent">Эцэг эх / Асран хамгаалагч</option>
+                        <option value="teacher">Бүлгийн багш</option>
+                        <option value="methodist">Арга зүйч</option>
+                        <option value="principal">Эрхлэгч</option>
+                        <option value="nutritionist">Хоол зүйч</option>
+                        <option value="cook">Тогооч</option>
+                        <option value="storekeeper">Нярав</option>
+                        <option value="doctor">Эмч</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Бүтэн нэр -->
+            <div class="form-group">
+                <label for="fullname">Овог, нэр</label>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="fullname" class="form-control" placeholder="Жишээ нь: Дорж Бат" required>
+                </div>
+            </div>
+
+            <!-- Утасны дугаар -->
+            <div class="form-group">
+                <label for="phone">Утасны дугаар</label>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="phone" class="form-control" placeholder="99112233" required>
+                </div>
+            </div>
+
+            <!-- Gmail хаяг -->
+            <div class="form-group">
+                <label for="email">Цахим шуудан (Gmail)</label>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="email" class="form-control" placeholder="example@gmail.com" required>
+                </div>
+            </div>
+
+            <!-- Урилгын код (Системийн аюулгүй байдал болон эрх баталгаажуулахад) -->
+            <div class="form-group">
+                <label for="invite-code">Урилгын код (Invite Code)</label>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="text" id="invite-code" class="form-control" placeholder="Цэцэрлэгээс олгосон кодыг оруулна уу" required>
+                </div>
+            </div>
+
+            <!-- Нууц үг -->
+            <div class="form-group">
+                <label for="password">Нууц үг</label>
+                <div class="input-with-icon">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <!-- Илгээх товч -->
+            <button type="submit" class="btn-submit">Бүртгүүлэх</button>
+
+            <!-- Нэвтрэх хэсэг рүү шилжих холбоос -->
+            <div class="login-link">
+                Бүртгэлтэй хэрэглэгч үү? <a href="login.html">Нэвтрэх</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

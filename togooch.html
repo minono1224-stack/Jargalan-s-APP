@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Тогоочийн Самбар</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6b81;
+            --primary-hover: #ff4757;
+            --secondary-color: #2ed573;
+            --bg-gradient: linear-gradient(135deg, #fbc531 0%, #ff6b81 50%, #70a1ff 100%);
+            --card-bg: #ffffff;
+            --text-color: #2f3542;
+            --border-color: #ffdde1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Зүүн талын навигацийн цэс */
+        aside {
+            width: 290px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px dashed var(--border-color);
+            background: #fff0f3;
+        }
+
+        .sidebar-header h2 {
+            font-size: 15px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .sidebar-menu {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: calc(100vh - 130px);
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 9px 12px;
+            margin-bottom: 5px;
+            border: 2px solid transparent;
+            background: #fff9fa;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #57606f;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .menu-btn:hover {
+            background: #ffeaa7;
+            color: #2f3542;
+            border-color: #fdcb6e;
+        }
+
+        .menu-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+
+        /* Баруун талын үндсэн контент */
+        main {
+            flex: 1;
+            margin-left: 290px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 4px solid #fff;
+        }
+
+        .section-pane { display: none; }
+        .section-pane.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.title {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 22px;
+        }
+
+        .subtitle {
+            color: #747d8c;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #57606f;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 13px;
+            background-color: #fff9fa;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(255, 107, 129, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        th, td {
+            border: 1px solid #dfe4ea;
+            padding: 10px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #ffeaa7;
+            color: #2d3436;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn:hover { background-color: #26af5f; transform: translateY(-1px); }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-export {
+            background-color: #0984e3;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
+        }
+        .btn-export:hover { background-color: #74b9ff; }
+
+        .btn-danger {
+            background-color: #ff4757;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+        }
+        .btn-danger:hover { background-color: #ff6b81; }
+
+        .alert-box {
+            background: #fff0f3;
+            border-left: 4px solid var(--primary-color);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .feedback-section {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px dashed #b2dfdb;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ЗҮҮН ТАЛЫН НАВИГАЦИЙН ЦЭС -->
+    <aside>
+        <div>
+            <div class="sidebar-header">
+                <h2>🍲 Тогоочийн Самбар</h2>
+                <p style="font-size: 11px; color: #747d8c;">Чандмань-Өндөр СӨБ</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <button class="menu-btn active" onclick="switchSection('sec-1', this)"><i class="fa-solid fa-house"></i> 1. Нүүр хэсэг</button>
+                <button class="menu-btn" onclick="switchSection('sec-2', this)"><i class="fa-solid fa-utensils"></i> 2. Хоолны цэс / бүртгэл</button>
+                <button class="menu-btn" onclick="switchSection('sec-3', this)"><i class="fa-solid fa-calendar-days"></i> 3. Хоолны 7 хоног / Төлөвлөгөө</button>
+                <button class="menu-btn" onclick="switchSection('sec-4', this)"><i class="fa-solid fa-bowl-food"></i> 4. Өдрийн хоол</button>
+                <button class="menu-btn" onclick="switchSection('sec-5', this)"><i class="fa-solid fa-users"></i> 5. Эцэг эх (Санал, Судалгаа)</button>
+                <button class="menu-btn" onclick="switchSection('sec-6', this)"><i class="fa-solid fa-comments"></i> 6. Зөвлөгөө & Хариу өгөх</button>
+                <button class="menu-btn" onclick="switchSection('sec-7', this)"><i class="fa-solid fa-file-lines"></i> 7. Тайлан (9–5 сар)</button>
+                <button class="menu-btn" onclick="switchSection('sec-8', this)"><i class="fa-solid fa-clipboard-user"></i> 8. Өдөр тутмын ирц</button>
+                <button class="menu-btn" onclick="switchSection('sec-9', this)"><i class="fa-solid fa-cart-shopping"></i> 9. Хүнс захиалах (Нярав)</button>
+                <button class="menu-btn" onclick="switchSection('sec-10', this)"><i class="fa-solid fa-vial"></i> 10. Дээж авалтын бүртгэл</button>
+                <button class="menu-btn" onclick="switchSection('sec-11', this)"><i class="fa-solid fa-stethoscope"></i> 11. Эмч зөвлөж байна</button>
+                <button class="menu-btn" onclick="switchSection('sec-12', this)"><i class="fa-solid fa-triangle-exclamation"></i> 12. Харшлын мэдээлэл</button>
+            </div>
+        </div>
+
+        <div style="padding: 12px; border-top: 2px dashed var(--border-color); text-align: center;">
+            <a href="login.html" style="font-size: 12px; color: #ff4757; font-weight: bold; text-decoration: none;">🚪 Системээс гарах</a>
+        </div>
+    </aside>
+
+    <!-- БАРУУН ТАЛЫН ҮНДСЭН КОНТЕНТ ХЭСЭГ -->
+    <main>
+        <div class="container">
+
+            <!-- 1. НҮҮР ХЭСЭГ -->
+            <div id="sec-1" class="section-pane active">
+                <h2 class="title">🏠 Тогоочийн нүүр хуудас</h2>
+                <p class="subtitle">Цэцэрлэгийн гал тогооны өдөр тутмын үйл ажиллагааны хяналт.</p>
+                <div class="alert-box"><b>⚠️ Анхаарах зүйл:</b> Өнөөдрийн ирц 120 хүүхэд.</div>
+            </div>
+
+            <!-- 2. ХООЛНЫ ЦЭС / БҮРТГЭЛ -->
+            <div id="sec-2" class="section-pane">
+                <h2 class="title">🍲 Хоолны цэс ба бүртгэл (Зөвхөн тогоочид харагдах)</h2>
+                <p class="subtitle">Шинэ цэс бүртгэх, файл зураг оруулах, засах, устгах болон татаж авах.</p>
+                <div class="form-group"><label>Огноо сонгох</label><input type="date"></div>
+                <div class="form-group"><label>Хоолны нэр</label><input type="text" placeholder="Гуляш"></div>
+                <div class="form-group"><label>Орц найрлага / Тэмдэглэл</label><textarea rows="3" placeholder="Орц найрлага..."></textarea></div>
+                <div class="form-group"><label>Зураг, файл оруулах</label><input type="file" accept="image/*,.doc,.docx,.pdf"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Амжилттай хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Word/PDF/Excel руу татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 3. ХООЛНЫ 7 ХОНОГ / ТӨЛӨВЛӨГӨӨ (+ ЭЦЭГ ЭХИЙН ЗӨВЛӨГӨӨ ӨГӨХ ХЭСЭГ) -->
+            <div id="sec-3" class="section-pane">
+                <h2 class="title">📅 7 хоногийн хоолны төлөвлөгөө</h2>
+                <p class="subtitle">Долоо хоногийн төлөвлөгөө боловсруулах, хавсралт оруулах.</p>
+                <div class="form-group"><label>Огноо сонгох</label><input type="date"></div>
+                <div class="form-group"><label>Төлөвлөгөөний тэмдэглэл</label><textarea rows="3" placeholder="7 хоногийн хуваарь..."></textarea></div>
+                <div class="form-group"><label>Зураг / Файл оруулах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+
+                <!-- Эцэг эх болон бусад хүмүүсийн зөвлөгөө өгөх хэсэг -->
+                <div class="feedback-section">
+                    <h3 style="font-size: 15px; color: var(--primary-color); margin-bottom: 10px;"><i class="fa-solid fa-comments"></i> Зөвлөгөө</h3>
+                    <div class="form-group">
+                        <label>Таны нэр & Албан тушаал / Эцэг эх</label>
+                        <input type="text" id="weeklyUser" placeholder="Жишээ нь: Д.Батчимэг (Эцэг эх)">
+                    </div>
+                    <div class="form-group">
+                        <label>Зөвлөгөө, саналын текст</label>
+                        <textarea id="weeklyComment" rows="2" placeholder="Энэ долоо хоногийн хоолны төлөвлөгөөнд өгөх санал..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Файл / Зураг хавсаргах</label>
+                        <input type="file" id="weeklyFile">
+                    </div>
+                    <button class="btn btn-primary" onclick="addWeeklyFeedback()">Зөвлөгөө илгээх</button>
+
+                    <table style="margin-top: 15px;">
+                        <thead><tr><th>Ирүүлсэн хүн</th><th>Санал, зөвлөгөө</th><th>Үйлдэл</th></tr></thead>
+                        <tbody id="weeklyFeedbackBody">
+                            <tr>
+                                <td><b>Д.Батчимэг</b> (Эцэг эх)</td>
+                                <td>Лхагва гарагийн хоолонд өндөгний харшилтай хүүхдүүдэд зориулсан орц анхаараарай.</td>
+                                <td><button class="btn btn-danger" style="padding:3px 6px; font-size:10px;" onclick="this.parentNode.parentNode.remove()">Устгах</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. ӨДРИЙН ХООЛ (+ ЭЦЭГ ЭХИЙН ЗӨВЛӨГӨӨ ӨГӨХ ХЭСЭГ) -->
+            <div id="sec-4" class="section-pane">
+                <h2 class="title">🥣 Өдрийн хоол</h2>
+                <p class="subtitle">Өдрийн хоолны бүртгэл, зураг болон файл хавсаргах.</p>
+                <div class="form-group"><label>Огноо сонгох</label><input type="date"></div>
+                <div class="form-group"><label>Хоолны нэр & Тэмдэглэл</label><input type="text" placeholder="Өнөөдрийн хоол"><textarea rows="2" placeholder="Тайлбар..."></textarea></div>
+                <div class="form-group"><label>Зураг / Файл оруулах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Нийтлэгдлээ!')">Хадгалах & Нийтлэх</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+
+                <!-- Эцэг эх болон бусад хүмүүсийн зөвлөгөө өгөх хэсэг -->
+                <div class="feedback-section">
+                    <h3 style="font-size: 15px; color: var(--primary-color); margin-bottom: 10px;"><i class="fa-solid fa-comments"></i> Өдрийн хоолонд өгөх санал, зөвлөгөө</h3>
+                    <div class="form-group">
+                        <label>Таны нэр & Албан тушаал / Эцэг эх</label>
+                        <input type="text" id="dailyUser" placeholder="Жишээ нь: Ө.Эрдэнэчимэг (Эмч / Эцэг эх)">
+                    </div>
+                    <div class="form-group">
+                        <label>Санал, зөвлөгөө</label>
+                        <textarea id="dailyComment" rows="2" placeholder="Өнөөдрийн хоолны амт, чанар дээр өгөх санал..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Файл / Зураг хавсаргах</label>
+                        <input type="file" id="dailyFile">
+                    </div>
+                    <button class="btn btn-primary" onclick="addDailyFeedback()">Санал илгээх</button>
+
+                    <table style="margin-top: 15px;">
+                        <thead><tr><th>Ирүүлсэн хүн</th><th>Санал, зөвлөгөө</th><th>Үйлдэл</th></tr></thead>
+                        <tbody id="dailyFeedbackBody">
+                            <tr>
+                                <td><b>Ө.Эрдэнэчимэг</b> (Эмч)</td>
+                                <td>Өнөөдрийн шөл амин дэм сайтай, халуун ногооны хэмжээ тохиромжтой байна.</td>
+                                <td><button class="btn btn-danger" style="padding:3px 6px; font-size:10px;" onclick="this.parentNode.parentNode.remove()">Устгах</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. ЭЦЭГ ЭХ -->
+            <div id="sec-5" class="section-pane">
+                <h2 class="title">👨‍👩‍👧 Эцэг эх (Санал, Судалгаа)</h2>
+                <p class="subtitle">Эцэг эхийн санал хүсэлт, судалгаанд файл оруулах, хариулах.</p>
+                <div class="form-group"><label>Огноо сонгох</label><input type="date"></div>
+                <div class="form-group"><label>Судалгаа / Санал бүртгэх</label><textarea rows="2" placeholder="Тэмдэглэл..."></textarea></div>
+                <div class="form-group"><label>Зураг / Файл хавсаргах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 6. ЗӨВЛӨГӨӨ -->
+            <div id="sec-6" class="section-pane">
+                <h2 class="title">💬 Зөвлөгөө & Хариу өгөх</h2>
+                <p class="subtitle">Ирсэн зөвлөгөөнд хариу бичих, файл хавсаргах.</p>
+                <div class="form-group"><label>Огноо сонгох</label><input type="date"></div>
+                <div class="form-group"><label>Хариу / Тэмдэглэл бичих</label><textarea rows="2" placeholder="Хариу..."></textarea></div>
+                <div class="form-group"><label>Файл / Зураг оруулах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Илгээгдлээ!')">Хадгалах & Илгээх</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 7. ТАЙЛАН -->
+            <div id="sec-7" class="section-pane">
+                <h2 class="title">📊 Тайлан (9–5 сар)</h2>
+                <p class="subtitle">Тайлан нэмэх, засварлах, файл зураг хавсаргаж илгээх.</p>
+                <div class="form-grid">
+                    <div class="form-group"><label>Огноо / Сар</label><input type="date"></div>
+                    <div class="form-group"><label>Тайлангийн гарчиг</label><input type="text" placeholder="Тайлангийн нэр"></div>
+                </div>
+                <div class="form-group"><label>Дэлгэрэнгүй тэмдэглэл</label><textarea rows="3" placeholder="Тайлангийн утга..."></textarea></div>
+                <div class="form-group"><label>Зураг, дуу бичлэг, Word/PDF файл оруулах</label><input type="file" accept="image/*,audio/*,.doc,.docx,.pdf"></div>
+                <button class="btn btn-primary" onclick="alert('🚀 Хянуулахаар илгээгдлээ!')">Илгээх</button>
+                <button class="btn btn-export" onclick="alert('📥 Word/PDF/Excel руу татаж байна...')">Татах / Хэвлэх</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 8. ӨДӨР ТУТМЫН ИРЦ -->
+            <div id="sec-8" class="section-pane">
+                <h2 class="title">📋 Өдөр тутмын ирц</h2>
+                <p class="subtitle">Бүлгүүдийн ирцийн нэгтгэл (Багшийн сантай холбогдсон).</p>
+                <table>
+                    <thead><tr><th>Бүлэг</th><th>Ирсэн хүүхэд</th></tr></thead>
+                    <tbody><tr><td>Пороро бүлэг</td><td>25 хүүхэд</td></tr></tbody>
+                </table>
+            </div>
+
+            <!-- 9. ХҮНС ЗАХИАЛАХ -->
+            <div id="sec-9" class="section-pane">
+                <h2 class="title">🛒 Хүнс захиалах (Нярав руу)</h2>
+                <p class="subtitle">Хүнсний захиалга үүсгэх, файл хавсаргах, татах.</p>
+                <div class="form-group"><label>Огноо сонгох</label><input type="date"></div>
+                <div class="form-group"><label>Захиалгын жагсаалт, тэмдэглэл</label><textarea rows="3" placeholder="Мах, гурил..."></textarea></div>
+                <div class="form-group"><label>Файл / Зураг оруулах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('📤 Захиалга илгээгдлээ!')">Захиалга илгээх</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах</button>
+                <button class="btn btn-danger" onclick="alert('🗑️ Устгагдлаа!')">Устгах</button>
+            </div>
+
+            <!-- 10. ДЭЭЖ АВАЛТЫН БҮРТГЭЛ -->
+            <div id="sec-10" class="section-pane">
+                <h2 class="title">🧪 Дээж авалтын бүртгэл</h2>
+                <p class="subtitle">Огноо, цаг, тэмдэглэл, зураг оруулах, хадгалах, засах, устгах, татах.</p>
+                <div class="form-grid">
+                    <div class="form-group"><label>Хоолны нэр</label><input type="text" id="sampleName" placeholder="Шөл"></div>
+                    <div class="form-group"><label>Огноо, цаг</label><input type="datetime-local" id="sampleDateTime"></div>
+                    <div class="form-group"><label>Температур / Хэмжээ</label><input type="text" id="sampleTemp" placeholder="+4°C / 100гр"></div>
+                </div>
+                <div class="form-group"><label>Дэлгэрэнгүй тэмдэглэл</label><textarea id="sampleDesc" rows="2" placeholder="Тэмдэглэл..."></textarea></div>
+                <div class="form-group"><label>Зураг / Файл оруулах</label><input type="file" id="sampleFile" accept="image/*,.doc,.docx,.pdf"></div>
+                <button class="btn btn-primary" onclick="saveSample()">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+
+                <table>
+                    <thead><tr><th>Огноо, Цаг</th><th>Нэр</th><th>Темп</th><th>Тэмдэглэл</th><th>Үйлдэл</th></tr></thead>
+                    <tbody id="sampleTableBody">
+                        <tr>
+                            <td>2026-11-17 11:30</td>
+                            <td><b>Шөл</b></td>
+                            <td>+4°C</td>
+                            <td>Хэвийн</td>
+                            <td>
+                                <button class="btn" style="padding:3px 6px; font-size:10px;" onclick="alert('✏️ Засварлах горим')">Засах</button>
+                                <button class="btn btn-danger" style="padding:3px 6px; font-size:10px;" onclick="this.parentNode.parentNode.remove()">Устгах</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 11. ЭМЧ ЗӨВЛӨЖ БАЙНА -->
+            <div id="sec-11" class="section-pane">
+                <h2 class="title">🩺 Эмч зөвлөж байна</h2>
+                <p class="subtitle">Эмчийн зөвлөмжтэй танилцах, тэмдэглэл болон файл хавсаргах.</p>
+                <div class="alert-box"><b>🩺 Эмчээс:</b> Хоолны эрүүл ахуйн зөвлөмж.</div>
+                <div class="form-group"><label>Өөрийн тэмдэглэл нэмэх</label><textarea rows="2" placeholder="Санал хүсэлт..."></textarea></div>
+                <div class="form-group"><label>Файл / Зураг оруулах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Хадгалагдлаа!')">Хадгалах</button>
+                <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах</button>
+            </div>
+
+            <!-- 12. ХАРШЛЫН МЭДЭЭЛЭЛ -->
+            <div id="sec-12" class="section-pane">
+                <h2 class="title">⚠️ Харшлын мэдээлэл</h2>
+                <p class="subtitle">Харшилтай хүүхдийн жагсаалт, тэмдэглэл нэмэх болон файл татах.</p>
+                <table>
+                    <thead><tr><th>Хүүхдийн нэр</th><th>Харшил үүсгэгч</th><th>Үйлдэл</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td>Б.Тэмүүлэн</td>
+                            <td>Өндөг, самар</td>
+                            <td>
+                                <button class="btn" style="padding:3px 6px; font-size:10px;">Засах</button>
+                                <button class="btn btn-danger" style="padding:3px 6px; font-size:10px;" onclick="this.parentNode.parentNode.remove()">Устгах</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="alert('➕ Шинэ харшлын мэдээлэл нэмэх цонх')">Шинэ бүртгэл нэмэх</button>
+                    <button class="btn btn-export" onclick="alert('📥 Татаж байна...')">Татах / Хэвлэх</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    <script>
+        function renderTogoochShared() {
+  if (typeof SharedStore === 'undefined') return;
+  const store = SharedStore.get();
+  const presentChildren = store.children.filter((c) => c.attendance === 'Ирсэн');
+
+  // 1. Нүүр хэсэг дээрх ирцийн тоог шинэчлэх[cite: 28]
+  const alertBox = document.querySelector('#sec-1 .alert-box');
+  if (alertBox) {
+    alertBox.innerHTML = `<b>⚠️ Анхаарах зүйл:</b> Өнөөдрийн ирц <b>${presentChildren.length}</b> хүүхэд (Нийт ${store.children.length}).`;
+  }
+
+  // 8. Өдөр тутмын ирц хүснэгт[cite: 28]
+  const attTbody = document.querySelector('#sec-8 tbody');
+  if (attTbody) {
+    const byGroup = {};
+    presentChildren.forEach((c) => {
+      byGroup[c.group] = (byGroup[c.group] || 0) + 1;
+    });
+    const rows = Object.entries(byGroup);
+    attTbody.innerHTML = rows.length
+      ? rows.map(([grp, cnt]) => `<tr><td>${grp}</td><td>${cnt} хүүхэд</td></tr>`).join('')
+      : `<tr><td colspan="2">Өнөөдөр ирсэн хүүхэд бүртгэгдээгүй байна.</td></tr>`;
+  }
+
+  // 12. Харшлын мэдээлэл[cite: 28]
+  const allergyTbody = document.querySelector('#sec-12 tbody');
+  if (allergyTbody) {
+    const allergic = store.children.filter((c) => c.allergies && c.allergies.length > 0);
+    allergyTbody.innerHTML = allergic
+      .map(
+        (c) => `
+        <tr>
+          <td>${c.name} (${c.group})</td>
+          <td>${c.allergies.join(', ')}</td>
+          <td><span style="color:#2ed573;font-weight:bold;">Баталгаажсан</span></td>
+        </tr>`
+      )
+      .join('');
+  }
+}
+
+// 9. Хүнс захиалах товчийг Няравтай холбох[cite: 28]
+const foodReqBtn = document.querySelector('#sec-9 .btn-primary');
+if (foodReqBtn) {
+  foodReqBtn.onclick = function () {
+    const dateInput = document.querySelector('#sec-9 input[type="date"]');
+    const textInput = document.querySelector('#sec-9 textarea');
+    const itemsText = textInput ? textInput.value.trim() : '';
+    if (!itemsText) {
+      alert('Захиалах хүнсний жагсаалтыг бичнэ үү!');
+      return;
+    }
+
+    SharedStore.update((store) => {
+      store.inventoryRequests.unshift({
+        id: Date.now(),
+        fromRole: 'Тогооч',
+        date: (dateInput && dateInput.value) || nowFormatted().split(' ')[0],
+        itemsText,
+        status: 'pending',
+        nyravNote: ''
+      });
+    });
+
+    textInput.value = '';
+    alert('📤 Хүнсний захиалга Няравын самбарт илгээгдлээ!');
+  };
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderTogoochShared();
+  if (typeof SharedStore !== 'undefined') {
+    SharedStore.onChange(renderTogoochShared);
+  }
+});
+        function switchSection(sectionId, btnElement) {
+            document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        function saveSample() {
+            const name = document.getElementById('sampleName').value.trim();
+            const datetime = document.getElementById('sampleDateTime').value;
+            const temp = document.getElementById('sampleTemp').value.trim();
+            const desc = document.getElementById('sampleDesc').value.trim();
+
+            if(!name || !datetime) {
+                alert("Хоолны нэр болон огноо, цагийг оруулна уу!");
+                return;
+            }
+
+            const tbody = document.getElementById('sampleTableBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${datetime.replace('T', ' ')}</td>
+                <td><b>${name}</b></td>
+                <td>${temp || 'Н/А'}</td>
+                <td>${desc || 'Тэмдэглэлгүй'}</td>
+                <td>
+                    <button class="btn" style="padding:3px 6px; font-size:10px;" onclick="alert('✏️ Засварлах горим')">Засах</button>
+                    <button class="btn btn-danger" style="padding:3px 6px; font-size:10px;" onclick="this.parentNode.parentNode.remove()">Устгах</button>
+                </td>
+            `;
+            tbody.prepend(row);
+            alert("✨ Дээж амжилттай хадгалагдлаа!");
+        }
+
+        // 7 хоногийн төлөвлөгөөнд зөвлөгөө нэмэх
+        function addWeeklyFeedback() {
+            const user = document.getElementById('weeklyUser').value.trim();
+            const comment = document.getElementById('weeklyComment').value.trim();
+
+            if(!user || !comment) {
+                alert("Нэр болон санал зөвлөгөөг бүрэн бичнэ үү!");
+                return;
+            }
+
+            const tbody = document.getElementById('weeklyFeedbackBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><b>${user}</b></td>
+                <td>${comment}</td>
+                <td><button class="btn btn-danger" style="padding:3px 6px; font-size:10px;" onclick="this.parentNode.parentNode.remove()">Устгах</button></td>
+            `;
+            tbody.prepend(row);
+            document.getElementById('weeklyUser').value = '';
+            document.getElementById('weeklyComment').value = '';
+            alert("✨ 7 хоногийн цэсэнд өгөх санал амжилттай нэмэгдлээ!");
+        }
+
+        // Өдрийн хоолонд санал нэмэх
+        function addDailyFeedback() {
+            const user = document.getElementById('dailyUser').value.trim();
+            const comment = document.getElementById('dailyComment').value.trim();
+
+            if(!user || !comment) {
+                alert("Нэр болон санал зөвлөгөөг бүрэн бичнэ үү!");
+                return;
+            }
+
+            const tbody = document.getElementById('dailyFeedbackBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><b>${user}</b></td>
+                <td>${comment}</td>
+                <td><button class="btn btn-danger" style="padding:3px 6px; font-size:10px;" onclick="this.parentNode.parentNode.remove()">Устгах</button></td>
+            `;
+            tbody.prepend(row);
+            document.getElementById('dailyUser').value = '';
+            document.getElementById('dailyComment').value = '';
+            alert("✨ Өдрийн хоолны санал амжилттай нэмэгдлээ!");
+        }
+    </script>
+</body>
+</html>

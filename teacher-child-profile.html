@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СБӨБ Стандарт Үнэлгээний Нэгдсэн Систем</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gradient-to-br from-orange-50/60 via-amber-50/30 to-orange-100/40 min-h-screen p-4 md:p-6 font-sans text-gray-800">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Дээд хэсэг -->
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-sm border border-orange-100 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center text-xl font-bold shadow-md">
+                    🧸
+                </div>
+                <div>
+                    <h2 class="text-xl font-extrabold text-gray-800 flex items-center gap-2">
+                        Пороро бүлэг — Сурагчдын Профайл ба Стандарт Үнэлгээ
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-0.5">Сургуулийн өмнөх боловсролын стандартын шалгуур (I-IV түвшин чеклэх систем)</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="text-xs font-bold text-gray-500">Эрх:</div>
+                <select id="userRoleSelect" onchange="changeUserRole()" class="text-xs border border-orange-300 rounded-xl px-3 py-2 bg-orange-50 font-bold text-orange-700 focus:outline-none">
+                    <option value="teacher">👩‍🏫 Багш (Бүрэн эрхтэй)</option>
+                    <option value="methodist">📊 Арга зүйч / Эрхлэгч (Хянах)</option>
+                    <option value="parent">👨‍👩‍👦 Эцэг эх (Харах)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Үндсэн цэсүүд -->
+        <div class="flex gap-2 border-b border-orange-200/60 pb-2 overflow-x-auto">
+            <button onclick="switchTab('evaluationTab')" id="btnEvalTab" class="px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-orange-500 text-white shadow-sm cursor-pointer">
+                📝 Сурагчийн Профайл ба Үнэлгээ
+            </button>
+            <button onclick="switchTab('classReportTab')" id="btnClassTab" class="px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-white/70 text-gray-600 hover:bg-orange-100/50 cursor-pointer">
+                📈 Анги нийтийн Баганан График
+            </button>
+            <button onclick="switchTab('periodReportTab')" id="btnPeriodTab" class="px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-white/70 text-gray-600 hover:bg-orange-100/50 cursor-pointer">
+                📅 Хугацааны тайлан
+            </button>
+        </div>
+
+        <!-- TAB 1: ПРОФАЙЛ БА ҮНЭЛГЭЭ -->
+        <div id="evaluationTab" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Зүүн тал: Жагсаалт -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-sm border border-orange-100 p-5 lg:col-span-4 space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-orange-100">
+                    <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                        📋 Ангийн сурагчид
+                    </h3>
+                    <button id="addStudentBtn" onclick="openAddStudentModal()" class="text-[10px] bg-orange-500 text-white px-2.5 py-1.5 rounded-xl font-bold hover:bg-orange-600 transition cursor-pointer">
+                        ➕ Сурагч нэмэх
+                    </button>
+                </div>
+
+                <div>
+                    <input type="text" id="studentSearchInput" onkeyup="filterStudents()" placeholder="Сурагчийн нэрээр хайх..." class="w-full text-xs border border-orange-200 rounded-xl p-2.5 bg-orange-50/30 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                </div>
+
+                <div id="studentCardsContainer" class="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
+                    <!-- JS -->
+                </div>
+            </div>
+
+            <!-- Баруун тал: Профайл болон Түвшин чеклэх -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-sm border border-orange-100 p-6 lg:col-span-8 space-y-6">
+                
+                <div id="noStudentSelected" class="text-center py-20 space-y-3">
+                    <div class="text-4xl">👆</div>
+                    <h3 class="text-base font-bold text-gray-700">Сурагч сонгогдоогүй байна</h3>
+                    <p class="text-xs text-gray-400 max-w-sm mx-auto">Профайл харах, засах болон стандарт шалгуур чеклэхийн тулд сурагч дээр дарна уу.</p>
+                </div>
+
+                <div id="activeStudentPanel" class="hidden space-y-6">
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-orange-50/50 border border-orange-200/60 p-4 rounded-2xl gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="relative group">
+                                <img id="activeStudentPhoto" src="https://images.unsplash.com/photo-1543332164-6e82f355badc?w=150" class="w-16 h-16 rounded-2xl object-cover border-2 border-orange-400 shadow-sm" alt="Сурагч">
+                                <label id="photoUploadLabel" class="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition cursor-pointer">
+                                    Зураг солих
+                                    <input type="file" id="studentPhotoInput" accept="image/*" onchange="updateStudentPhoto(event)" class="hidden">
+                                </label>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <h3 id="activeStudentName" class="text-base font-bold text-gray-900">Нэр</h3>
+                                    <button id="editStudentBtn" onclick="openEditStudentModal()" class="text-[10px] bg-white border border-orange-300 text-orange-600 px-2 py-0.5 rounded-lg font-bold hover:bg-orange-50">✏️ Засах</button>
+                                </div>
+                                <p id="activeStudentMeta" class="text-xs text-orange-600 font-medium">Пороро бүлэг • Нас: 4</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-xl font-bold">Үнэлсэн түүх: <span id="activeEvalCount">0</span></span>
+                        </div>
+                    </div>
+
+                    <div id="teacherEvaluationFormContainer" class="bg-orange-50/20 border border-orange-100 p-5 rounded-2xl space-y-4">
+                        <h4 class="text-xs font-extrabold text-orange-600 uppercase tracking-wider flex items-center gap-1.5">
+                            ✍️ Стандарт шалгуур ба Түвшин чеклэх
+                        </h4>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1.5">Сургалтын чиглэл</label>
+                                <select id="selectDomain" onchange="populateSubDomains()" class="w-full text-xs border border-orange-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none">
+                                    <option value="social">Нийгэм-сэтгэл хөдлөл</option>
+                                    <option value="physical">Хөдөлгөөн, эрүүл мэнд</option>
+                                    <option value="language">Хэл яриа</option>
+                                    <option value="nature">Байгаль, нийгмийн орчин</option>
+                                    <option value="math">Математик</option>
+                                    <option value="art">Зураг, урлал</option>
+                                    <option value="music">Хөгжим</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1.5">Ай / Дэд ай</label>
+                                <select id="selectSubDomain" onchange="populateCriteria()" class="w-full text-xs border border-orange-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none">
+                                    <!-- JS -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1.5">Шалгуур үзүүлэлт (I-IV түвшин)</label>
+                            <select id="selectCriteria" class="w-full text-xs border border-orange-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none">
+                                <!-- JS -->
+                            </select>
+                        </div>
+
+                        <div class="bg-white border border-orange-200 p-4 rounded-xl space-y-2">
+                            <label class="block text-xs font-extrabold text-gray-700">Түвшин чеклэх (Олон сонгож болно):</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                                <label class="flex items-center gap-2 text-xs font-medium text-gray-700 bg-orange-50/50 p-2 rounded-lg border border-orange-100 cursor-pointer">
+                                    <input type="checkbox" name="evalLevel" value="1" class="w-4 h-4 text-orange-500 rounded accent-orange-500">
+                                    <span><b>I түвшин</b> - Дэмжлэгтэй</span>
+                                </label>
+                                <label class="flex items-center gap-2 text-xs font-medium text-gray-700 bg-orange-50/50 p-2 rounded-lg border border-orange-100 cursor-pointer">
+                                    <input type="checkbox" name="evalLevel" value="2" class="w-4 h-4 text-orange-500 rounded accent-orange-500">
+                                    <span><b>II түвшин</b> - Зааварчилгаагаар</span>
+                                </label>
+                                <label class="flex items-center gap-2 text-xs font-medium text-gray-700 bg-orange-50/50 p-2 rounded-lg border border-orange-100 cursor-pointer">
+                                    <input type="checkbox" name="evalLevel" value="3" class="w-4 h-4 text-orange-500 rounded accent-orange-500">
+                                    <span><b>III түвшин</b> - Бие даан</span>
+                                </label>
+                                <label class="flex items-center gap-2 text-xs font-medium text-gray-700 bg-orange-50/50 p-2 rounded-lg border border-orange-100 cursor-pointer">
+                                    <input type="checkbox" name="evalLevel" value="4" class="w-4 h-4 text-orange-500 rounded accent-orange-500">
+                                    <span><b>IV түвшин</b> - Бүрэн эзэмшиж тайлбарлах</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1.5">Багшийн ажиглалт ба зөвлөмж</label>
+                            <textarea id="teacherObservation" rows="2" placeholder="Ахиц дэвшлийн тухай..." class="w-full text-xs border border-orange-200 rounded-xl p-2.5 bg-white font-medium focus:outline-none"></textarea>
+                        </div>
+
+                        <div class="flex justify-end pt-1">
+                            <button onclick="saveEvaluationForActiveStudent()" class="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">
+                                Хадгалах
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-orange-100 p-4 rounded-2xl space-y-3 shadow-2xs">
+                        <h4 class="text-xs font-bold text-gray-700">📊 Сурагчийн ахиц дэвшил</h4>
+                        <div id="studentProgressBarContainer" class="space-y-2 pt-1"></div>
+                    </div>
+
+                    <div class="space-y-3 pt-2">
+                        <h4 class="text-xs font-bold text-gray-700">📌 Үнэлгээний түүх</h4>
+                        <div id="activeStudentHistoryList" class="space-y-2.5 max-h-[200px] overflow-y-auto pr-1"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TAB 2: АНГИ НИЙТИЙН БАГАНАН ГРАФИК -->
+        <div id="classReportTab" class="hidden space-y-6">
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-sm border border-orange-100 p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-orange-100 gap-3">
+                    <div>
+                        <h3 class="text-base font-bold text-gray-800">📊 Пороро бүлгийн анги нийтийн баганан график (Bar Chart)</h3>
+                        <p class="text-xs text-gray-400">Сургалтын 7 чиглэл тус бүрээр ангийн нийт хүүхдүүдийн эзэмшилт ямар түвшинд байгааг харуулав</p>
+                    </div>
+                    <div class="bg-orange-50 border border-orange-200 px-4 py-2 rounded-2xl text-xs font-bold text-orange-700">
+                        Ангийн дундаж гүйцэтгэл: <span id="classAveragePercent" class="text-orange-600">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-orange-50/30 border border-orange-100 p-6 rounded-2xl">
+                    <div id="verticalBarChartContainer" class="flex items-end justify-around h-64 border-b-2 border-orange-300 pb-2 gap-2 overflow-x-auto pt-6"></div>
+                    <div id="chartXAxisLabels" class="grid grid-cols-7 gap-1 pt-3 text-center text-[10px] font-bold text-gray-700"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2" id="classDetailedStatsContainer"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ХУГАЦААНЫ ТАЙЛАН -->
+        <div id="periodReportTab" class="hidden space-y-6">
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-sm border border-orange-100 p-6 space-y-6">
+                <div class="flex justify-between items-center pb-4 border-b border-orange-100">
+                    <div>
+                        <h3 class="text-base font-bold text-gray-800">📅 7 хоног / 2 долоо хоногийн тайлан</h3>
+                        <p class="text-xs text-gray-400">Амжилттай заасан сэдэв болон цаашид ажиллах төлөвлөгөө</p>
+                    </div>
+                    <button id="addPeriodReportBtn" onclick="openAddPeriodModal()" class="px-4 py-2 bg-orange-500 text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer">
+                        ➕ Тайлан нэмэх
+                    </button>
+                </div>
+                <div id="periodReportListContainer" class="space-y-4"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript Логик ба Стандартын Өгөгдлийн Сан -->
+    <script>
+        let studentsData = [
+            { 
+                id: 1, name: "Тэмүүлэн Батбаяр", gender: "Эрэгтэй", age: 4, 
+                photo: "https://images.unsplash.com/photo-1543332164-6e82f355badc?w=150",
+                evaluations: [
+                    { domainKey: "social", domain: "Нийгэм-сэтгэл хөдлөл", criteria: "НСХ2.1а. Биеийн мэдрэмж, сэтгэл хөдлөлийг үгээр илэрхийлдэг болно.", levels: [2, 3], note: "Сэтгэл хөдлөлөө илэрхийлж байна.", date: "2026-11-10" },
+                    { domainKey: "math", domain: "Математик", criteria: "МАТ3.1а. 10 хүртэл тоог цээжээр тоолох, 5 хүртэл тооны юмсыг оноож тоолох.", levels: [3, 4], note: "Сайн байна.", date: "2026-11-12" }
+                ] 
+            },
+            { 
+                id: 2, name: "Амин-Эрдэнэ Номин", gender: "Эмэгтэй", age: 4, 
+                photo: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=150",
+                evaluations: [
+                    { domainKey: "math", domain: "Математик", criteria: "МАТ3.1а. 10 хүртэл тоог цээжээр тоолох, 5 хүртэл тооны юмсыг оноож тоолох.", levels: [3, 4], note: "Маш сайн тоолж байна.", date: "2026-11-12" },
+                    { domainKey: "language", domain: "Хэл яриа", criteria: "ХЯ3.1а. Асуултыг ойлгож хариулт өгнө.", levels: [2, 3], note: "Анхааралтай байна.", date: "2026-11-13" }
+                ] 
+            }
+        ];
+
+        let periodReportsData = [
+            {
+                id: 1,
+                periodTitle: "11 сарын 1-р 2 долоо хоног (Миний бие)",
+                successfulTopics: "Үндсэн сэтгэл хөдлөлийг ялгаж сурсан.",
+                challenges: "Зарим хүүхэд бусдыг ойлгох дээр тусламж хэрэгтэй.",
+                nextSteps: "Дүрд тоглох тоглоомоор бататгана.",
+                date: "2026-11-14"
+            }
+        ];
+
+        let selectedStudentId = null;
+        let currentRole = "teacher";
+
+        // Таны оруулсан албан ёсны стандартын бүрэн өгөгдлийн сан
+        const curriculumDatabase = {
+            social: { 
+                name: "Нийгэм-сэтгэл хөдлөл", 
+                subDomains: [
+                    { id: "nsx_ai1", name: "Ай 1. Өөрийгөө таних", criteria: [
+                        { text: "НСХ1.1а. Биеийн зарим мэдрэмжээ нүүр, гар, биеийн хөдөлгөөн, дуу авиа, үгээр илэрхийлдэг болно." },
+                        { text: "НСХ2.1а. Биеийн мэдрэмж, сэтгэл хөдлөлийг үгээр илэрхийлдэг болно." },
+                        { text: "НСХ3.1а. Сэтгэл хөдлөлөө таатай, таагүй байгааг илэрхийлдэг болно." },
+                        { text: "НСХ4.1а. Сэтгэлийн мэдрэмжээ таатай, таагүй байгааг илэрхийлдэг болно." },
+                        { text: "НСХ1.1б. Өөрийн хэрэгцээг нүүр, гар, биеийн хөдөлгөөн, дуу авиа, үгээр илэрхийлдэг болно." },
+                        { text: "НСХ2.1б. Өөрийн хэрэгцээгээ илэрхийлдэг болно." },
+                        { text: "НСХ3.1б. Өөрийн дуртай дургүй, чадах чадахгүй зүйлсээ илэрхийлж хэрэгцээгээ тайлбарладаг болно." },
+                        { text: "НСХ4.1б. Өөрийн дуртай дургүй, чадах чадахгүй зүйлсийг тайлбарлаж сонголт хийдэг болно." },
+                        { text: "НСХ1.1в. Уурлаж тавгүйтсэн үедээ насанд хүрэгчээр аргадуулж тайвширдаг болно." },
+                        { text: "НСХ2.1в. Уурлаж тавгүйтсэн шалтгааныг нь асууж ярилцахад тайвширдаг болно." },
+                        { text: "НСХ3.1в. Уурлаж тавгүйтсэн үедээ бусадтай ярилцах, \"тайвшрах булан\"-д очих зэргээр тайвширдаг болно." },
+                        { text: "НСХ4.1в. Тайвшрах аргаас насанд хүрэгчийн тусламжтай хэрэглэдэг болно." }
+                    ]},
+                    { id: "nsx_ai2", name: "Ай 2. Бусадтай харилцах", criteria: [
+                        { text: "НСХ1.2а. Бусдын биеийн зарим мэдрэмжийг ойлгодог болно." },
+                        { text: "НСХ2.2а. Бусдын биеийн мэдрэмж, сэтгэл хөдлөлийг үгээр нэрлэдэг болно." },
+                        { text: "НСХ3.2а. Бусдын сэтгэл хөдлөлийн таатай, таагүй, байгааг тайлбарладаг болно." },
+                        { text: "НСХ4.2а. Бусдын сэтгэлийн мэдрэмж нь таатай, таагүй байгааг тайлбарладаг болно." },
+                        { text: "НСХ1.2б. Бусдыг энэрсэн сэтгэлээ нүүр гар, биеийн хөдөлгөөн, дуу авиа, үгээр илэрхийлдэг болно." },
+                        { text: "НСХ2.2б. Насанд хүрэгчийн тусламжтай бусдын биеийн мэдрэмж, сэтгэл хөдлөлийг анзаарч энэрэх үйлдэл үзүүлдэг болно." },
+                        { text: "НСХ3.2б. Бусдын таагүй сэтгэл хөдлөлийн шалтгааныг энгийнээр тайлбарлаж энэрэх үйлдэл үзүүлдэг болно." },
+                        { text: "НСХ4.2б. Бусдын нөхцөл байдалд тохируулан энэрэх үйлдэл үзүүлдэг болно." },
+                        { text: "НСХ1.2в. Насанд хүрэгчийн тусламжтай зарим зан үйлүүдийг таньдаг болно." },
+                        { text: "НСХ2.2в. Насанд хүрэгчийн тусламжтай зан үйлүүдийг тустай, тусгүйгээр ангилдаг болно." },
+                        { text: "НСХ3.2в. Зан үйлүүдийг яагаад тустай, тусгүй болохыг тайлбарладаг болно." },
+                        { text: "НСХ4.2в. Үүссэн зөрчилдөөнийг багшийн чиглүүлэгтэйгээр тустай зан үйлээр шийддэг болно." }
+                    ]},
+                    { id: "nsx_ai3", name: "Ай 3. Харилцан хамаарах", criteria: [
+                        { text: "НСХ1.3а. Насанд хүрэгчийн тусламжтайгаар байнга хэрэглэдэг эд юмсыг байранд нь хураадаг болно." },
+                        { text: "НСХ2.3а. Юмс үзэгдлийн хоорондын хамаарлыг таньж ойлгодог болно." },
+                        { text: "НСХ3.3а. Өөрийнх нь үйлдэл бусдад хэрхэн нөлөөлдгийг ойлгож тайлбарладаг болно." },
+                        { text: "НСХ4.3а. Хүмүүс хоорондоо хэрхэн харилцан хамааралтай байдгийг тайлбарладаг болно." },
+                        { text: "НСХ1.3б. Бусад хүмүүс ижил зүйл хийж байгааг ажиглаж мэддэг болно." },
+                        { text: "НСХ2.3б. Багшийн чиглүүлэгтэйгээр бусадтай харагдах байдлаар ижил төстэй байгааг тодорхойлно." },
+                        { text: "НСХ3.3б. Бусадтай сэтгэл хөдлөл, сонирхлоороо ижил төстэйгөө мэддэг болно." },
+                        { text: "НСХ4.3б Өөрөө хүмүүсээс олон талаараа ялгаатай, ижил төстэй байгааг тодорхойлдог болно." },
+                        { text: "НСХ1.3в. Насанд хүрэгчийн тусламжтай өдрийн хуваарьт үйл ажиллагаанд дасан зохицож оролцдог болно." },
+                        { text: "НСХ2.3в. Аливаа үйл ажиллагаанд бие даан дуртай оролцдог болно." },
+                        { text: "НСХ3.3в. Үйл ажиллагаанд тодорхой үүрэг хүлээж оролцдог болно." },
+                        { text: "НСХ4.3в. Өдөр тутмын үйл ажиллагаанд тодорхой дүрэм баримтлан хамтран оролцдог болно." }
+                    ]}
+                ] 
+            },
+            physical: { 
+                name: "Хөдөлгөөн, эрүүл мэнд", 
+                subDomains: [
+                    { id: "xem_ai1", name: "Ай 1. Хөдөлгөөн", criteria: [
+                        { text: "ХЭМ1.1а. Гарын сарвууг атгах, тэнийлгэх, сэгсрэх, базах хөдөлгөөнийг жижиг тоглоом, эд зүйлийг ашиглан тоглож гүйцэтгэнэ." },
+                        { text: "ХЭМ2.1а. Гарын сарвууг өргөх буулгах, татах, түлхэх, бугуйн үеэр эргүүлэх хөдөлгөөнийг даган дуурайж гүйцэтгэнэ." },
+                        { text: "ХЭМ3.1а. Гарын сарвуу, хөлийн тавхайн хэсгээр хийх хөдөлгөөнийг зэрэг болон ээлжлэн гүйцэтгэнэ." },
+                        { text: "ХЭМ4.1а. Гарын сарвуу, хөлийн тавхайн хэсгээр хийх зохиомжит дасгалыг босоо, суугаа байрлалд дэс дарааллын дагуу гүйцэтгэнэ." },
+                        { text: "ХЭМ1.1б. Суугаа байрлалд өлмийг ээтийлгэх, жийх хөдөлгөөнийг гүйцэтгэнэ." },
+                        { text: "ХЭМ2.1б. Суугаа байрлалд шагайн үеэр эргүүлэх, өлмий ба өсгийг нийлүүлэх, салгах хөдөлгөөнийг гүйцэтгэнэ." },
+                        { text: "ХЭМ1.1в. Дугуй дүрс (20 см диаметр) дээр гараа алдлан тэнцвэр хадгалан зогсоно." },
+                        { text: "ХЭМ2.1в. Гараа ташаанд авч, баруун эсвэл зүүн хөлийг тулалтын хөлийн шагайнд нааж тэнцвэр хадгалан (тогоруу) зогсоно." },
+                        { text: "ХЭМ3.1в. Гарыг дээш өргөн алгаа хавсарч баруун эсвэл зүүн хөлийг тулалтын хөлийн өвдгөнд нааж тэнцвэр хадгалан (дэглий) зогсоно." },
+                        { text: "ХЭМ4.1в. Гараа алдлан нэг хөлөө арагш шулуун өргөн тэнцвэр хадгалан (хараацай) зогсоно." },
+                        { text: "ХЭМ1.1г. Байрандаа болон чиглэлээ өөрчилж алхаж, гүйнэ." },
+                        { text: "ХЭМ2.1г. Алхаж, гүйхдээ гар хөлийн хөдөлгөөнөө хослуулан хурдан, удаан гүйцэтгэнэ." },
+                        { text: "ХЭМ3.1г. Алхалт гүйлтийг чиглэл, хурдаа өөрчлөн гүйцэтгэнэ." },
+                        { text: "ХЭМ4.1г. Алхалт, гүйлтийг хөгжмийн хэмнэлд тохируулан чиглэл, хурдаа өөрчилж гүйцэтгэнэ." },
+                        { text: "ХЭМ1.1д. Сэдэвт алхалт, гүйлтийг багшийн зааврын дагуу даган дуурайж гүйцэтгэнэ." },
+                        { text: "ХЭМ2.1д. Сэдэвт алхалт, гүйлтийг хэрэглэл ашиглан гүйцэтгэнэ." },
+                        { text: "ХЭМ3.1д. Алхалт,гүйлт бүхий хөдөлгөөнт тоглоомыг хамтран тоглоно." },
+                        { text: "ХЭМ4.1д. Алхалт,гүйлт бүхий хөдөлгөөнт тоглоомыг дүрд орж хамтран тоглоно." },
+                        { text: "ХЭМ1.1е. Дөрвөн хөллөж 20 см-ын зайтай зураасны хооронд мөлхөнө." },
+                        { text: "ХЭМ2.1е. Саадыг сүлжиж, чиглэлээ өөрчлөн мөлхөнө." },
+                        { text: "ХЭМ3.1е. Мөлхөлтийн төрлүүдийг (бөгсөөрөө гулсах, өвдөг тохойны тусламжтай мөлхөх) хэрэглэл ашиглан гүйцэтгэнэ." },
+                        { text: "ХЭМ4.1е. Мөлхөлтийн төрлүүдийг (туулай мөлхөлт, элгээр гулсаж мөлхөх, нуруугаар гулсаж мөлхөх) хэрэглэл ашиглан гүйцэтгэнэ." },
+                        { text: "ХЭМ1.1ж. Хэвтээ байрлалд хажуу тийш (харандаа) 2 удаа дараалан өнхөрнө." },
+                        { text: "ХЭМ2.1ж. Хэвтээ байрлалд хажуу тийш (харандаа) 3 удаа үргэлжлүүлэн өнхөрнө." },
+                        { text: "ХЭМ3.1ж. Туулай мөлхөлтийн байрлалаас хажуу тийш 1 удаа өнхөрнө." },
+                        { text: "ХЭМ4.2ж. Туулай мөлхөлтийн байрлалаас хажуу тийш 2 удаа үргэлжлүүлэн өнхөрнө." },
+                        { text: "ХЭМ1.1з. Байрандаа алхаж эргэнэ." },
+                        { text: "ХЭМ2.1з. Байрандаа өлмий дээр хөлөө зөөж эргэнэ." },
+                        { text: "ХЭМ3.1з. Байрандаа хөнгөн үсэрч эргэнэ." },
+                        { text: "ХЭМ4.1з. Байрандаа 1 хөл дээр догонцож эргэнэ." },
+                        { text: "ХЭМ1.1и. Хоёр хөл дээр байрандаа үсэрч бууна." },
+                        { text: "ХЭМ2.1и. Хоёр хөл дээр 5 зураас давж үсэрч бууна. (зураас хоорондын зай 35 см)" },
+                        { text: "ХЭМ3.1и. Хоёр хөл дээр 10 зураас давж үсэрч бууна. (зураас хоорондын зай 60 см)" },
+                        { text: "ХЭМ4.1и. Байрнаас уртад харайна." },
+                        { text: "ХЭМ2.1к. Өргөсөн гараас дээш 5 см өндөр зүйлд үсэрч хүрнэ." },
+                        { text: "ХЭМ3.1к. Өргөсөн гараас дээш 10-15 см өндөр зүйлд үсэрч хүрнэ." },
+                        { text: "ХЭМ4.1к. 30 см өндөртэй тавцан дээрээс үсэрч бууна." },
+                        { text: "ХЭМ1.1л. Шатны бариулаас барьж 10 гишгүүрт өгсөж, уруудна." },
+                        { text: "ХЭМ2.1л. Өндөрлөг (40 см) зүйл дээр авирч гарна, бууна." },
+                        { text: "ХЭМ3.1л. Хананд байрлуулсан шатны 5 гишгүүрт авирч гарна, бууна." },
+                        { text: "ХЭМ4.1л. Хананд байрлуулсан шат болон олсны 10 гишгүүрт авирч гарна; бууна." },
+                        { text: "ХЭМ1.1м. Бөмбөгийг ойр зайд шидэж дамжуулна, барьж авна." },
+                        { text: "ХЭМ2.1м. Бөмбөгийг дээш шиднэ, барьж авна." },
+                        { text: "ХЭМ3.1м. Бөмбөгийг дээш шидээд газарт ойлгон барьж авна." },
+                        { text: "ХЭМ4.1м. Бөмбөгийг хана руу шиднэ, барьж авна." },
+                        { text: "ХЭМ3.1н. Хурдтай өнхрч байгаа том бөмбөг, цагариганаас бултаж, зугтана." },
+                        { text: "ХЭМ4.1н. Шидсэн бөмбөгнөөс бултаж, зугтана." },
+                        { text: "ХЭМ1.1о. Бөмбөгийг 1,5 м зайд өшиглөж өнхрүүлж, дамжуулна." },
+                        { text: "ХЭМ2.1о. Бөмбөгийг 3 м зайд өшиглөж өнхрүүлнэ." },
+                        { text: "ХЭМ3.1о. Бөмбөгийг 1,5 м зайнаас өшиглөж, өнхрүүлж, ононо." },
+                        { text: "ХЭМ4.1о. Саваа модоор бөмбөгийг өнхрүүлж саадыг сүлжинэ." }
+                    ]},
+                    { id: "xem_ai2", name: "Ай 2. Эрүүл ахуй", criteria: [
+                        { text: "ХЭМ1.2а. Хувийн ариун цэврийг сахих үйлийг насанд хүрэгчийн дэмжлэгтэйгээр хамтран хийнэ." },
+                        { text: "ХЭМ2.2а. Хувийн ариун цэврийг сахих үйлийг насанд хүрэгчийн зааварчилгаагаар хийнэ." },
+                        { text: "ХЭМ3.2а. Хувийн ариун цэвэр сахих үйлийг насанд хүрэгчийн сануулгатайгаар бие даан хийнэ." },
+                        { text: "ХЭМ4.2а. Хувийн ариун цэвэр сахих үйлийг өөрийн санаачилгаар бие даан хийнэ." },
+                        { text: "ХЭМ2.2б. Цэвэр болон бохирдсон хувцсыг ялгана." },
+                        { text: "ХЭМ3.2б. Хувцсаа цэвэр өмсөж, бохирдсон тохиолдолд насанд хүрэгчийн сануулгатайгаар солино." },
+                        { text: "ХЭМ4.2б. Хувцасны цэвэр, бохир байдлыг ялгаж ойлган, бохирдсон үед өөрийн санаачилгаар цэвэр хувцсаар сольж өмсдөг болно." },
+                        { text: "ХЭМ1.2в. Хоол хүнсний бүтээгдэхүүнийг угааж, чанаж болгож иддэгийг мэднэ, ялгана." },
+                        { text: "ХЭМ2.2в. Жимс, хүнсний ногоог насанд хүрэгчтэй хамтран угааж, хэрэглэнэ." },
+                        { text: "ХЭМ3.2в. Хоол, хүнсний бүтээгдэхүүнээс эрүүл мэндэд тустай хүнсийг ялгаж, хэрэглэнэ." },
+                        { text: "ХЭМ4.2в. Хүнсний бүтээгдэхүүний төрлийг мэдэж, насанд хүрэгчтэй хамтран хялбар зууш бэлтгэнэ." },
+                        { text: "ХЭМ1.2г. Хоолны хэрэгслийг нэрлэж, зориулалтын дагуу хэрэглэнэ." },
+                        { text: "ХЭМ2.2г. Өөрийн хоолны хэрэгслийг хэрэглэнэ, хоолны дараа хураана." },
+                        { text: "ХЭМ3.2г. Хооллох үеийн дүрмийг зохиож, мөрдөнө." },
+                        { text: "ХЭМ4.2г. Хоолны хэрэгслийг угааж, цэвэрлэхэд насанд хүрэгчтэй хамтран оролцоно." },
+                        { text: "ХЭМ2.2д. Өөрийн бие эрхтний онцлог ялгааг мэдэж, бусад хүмүүс хүрч болох, болохгүй хэсгийг ялгаж танина." },
+                        { text: "ХЭМ3.2д. Өөрийн болон бусдын биеийн хүрч болохгүй хэсгийг ялгаж, шаардлагатай үед “Үгүй” гэж хэлж өөрийгөө хамгаална." },
+                        { text: "ХЭМ4.2д. Хувийн аюулгүй байдлаа хамгаалах дүрмийг өдөр тутмын амьдралд дагаж мөрдөнө." },
+                        { text: "ХЭМ1.2е. Хүрээлэн буй орчинд байгаа болгоомжлох зүйлсийг мэднэ, ялгана." },
+                        { text: "ХЭМ2.2е. Хүрээлэн байгаа орчныг ажиглаж, аюултай байж болох зүйлсийг ялгаж, хүрэхгүй байна." },
+                        { text: "ХЭМ3.2е. Хүрээлэн байгаа орчин дахь анхааруулах, болгоомжлох тэмдэг, тэмдэглэгээг таньж, дагаж мөрдөнө." },
+                        { text: "ХЭМ4.2е. Хүрээлэн байгаа орчин дахь анхааруулах, болгоомжлох дүрмийг хамтдаа зохиож, өдөр тутам мөрдөнө." },
+                        { text: "ХЭМ1.2ж. Цаг агаарын үзэгдлийг таньж нэрлэн, насанд хүрэгчийн сануулгыг дуурайн дагана." },
+                        { text: "ХЭМ2.2ж. Цаг агаарын үзэгдлийг ялгаж, насанд хүрэгчийн сануулгыг даган, аюулгүй байдлыг сахих үйлдэл хийнэ." },
+                        { text: "ХЭМ3.2ж. Цаг агаарын үзэгдлийг тайлбарлан, насанд хүрэгчийн сануулгатай болгоомжлох үйлдэл хийнэ." },
+                        { text: "ХЭМ4.2ж. Цаг агаарын үзэгдлийг ажиглан өөрийгөө болон бусдыг хамгаалах үйлдэл санаачлан хийнэ." },
+                        { text: "ХЭМ3.2з. Ухаалаг төхөөрөмжийн хэрэглээний эерэг, сөрөг нөлөөг мэдэж, өөрийгөө хамгаалах үйлдэл хийнэ." },
+                        { text: "ХЭМ4.2з. Ухаалаг төхөөрөмжийн хэрэглээний эерэг, сөрөг нөлөөг тайлбарлан, зохистой хэрэглэх цаг, дүрмийг мөрдөж, бусдад сануулна." }
+                    ]}
+                ] 
+            },
+            language: { 
+                name: "Хэл яриа", 
+                subDomains: [
+                    { id: "lang_ai1", name: "Ай 1. Сонсох", criteria: [
+                        { text: "ХЯ1.1а. Бусдын яриаг сонсоод ойлгосноо үг үйлдлээр илэрхийлнэ." },
+                        { text: "ХЯ2.1а. Бусдын яриаг анхаарч сонсоно, үг богино өгүүлбэрээр хариулна." },
+                        { text: "ХЯ3.1а. Асуултыг ойлгож хариулт өгнө." },
+                        { text: "ХЯ4.1а. Зохиолын агуулгыг сонсоод ойлгосноо өөрийн үгээр илэрхийлнэ." },
+                        { text: "ХЯ1.1б. Хэлсэн авиаг сонсоод давтан хэлнэ." },
+                        { text: "ХЯ2.1б. 3-4 үгтэй өгүүлбэрийг давтаж хэлнэ." },
+                        { text: "ХЯ3.1б. Урт, богино авиа орсон үгийг сонсоод ялгаж хэлнэ." },
+                        { text: "ХЯ4.1б. Үгийн эхэнд болон төгсгөлд орсон авиаг сонсоод ялгаж хэлнэ." }
+                    ]},
+                    { id: "lang_ai2", name: "Ай 2. Ярих", criteria: [
+                        { text: "ХЯ1.2а. Харилцан яриаг ажиглан, үг, өгүүлбэрийг дуурайна." },
+                        { text: "ХЯ2.2а. Энгийн өгүүлбэрээр харилцан ярилцана." },
+                        { text: "ХЯ3.2а. Харилцан ярианд өөрийн санаачилгаар оролцож, санал бодлоо илэрхийлнэ." },
+                        { text: "ХЯ4.2а. Тодорхой сэдвээр санаа бодлоо илэрхийлж, идэвхтэй ярилцана." },
+                        { text: "ХЯ1.2б. Ярилцахдаа асуулт асуух оролдлого хийнэ." },
+                        { text: "ХЯ2.2б. Бусадтай харилцахдаа энгийн, яриатай холбогдсон асуулт асууна." },
+                        { text: "ХЯ3.2б. Харилцан ярианд сонирхсон зүйлийн тухай асууж, тодруулна." },
+                        { text: "ХЯ4.2б. Харилцан яриаг асуулт тавьж эхлүүлж, хариултын хүрээнд үргэлжлүүлж ярилцана." },
+                        { text: "ХЯ1.2в. Танил эд юмсыг нэрлэнэ." },
+                        { text: "ХЯ2.2в. Юмсын өнгө, хэмжээ, байрлал заасан үгээр ярина." },
+                        { text: "ХЯ3.2в. Юмсын шинж чанар, онцлог илэрхийлсэн үгийг яриандаа ашиглана." },
+                        { text: "ХЯ4.2в. Ерөнхийлсөн нэрийг яриандаа ашиглана." },
+                        { text: "ХЯ1.2г. Хүсэл, хэрэгцээгээ тохирох үгс ашиглан илэрхийлнэ." },
+                        { text: "ХЯ2.2г. Үгийн утгыг ойлгож, хураангуй өгүүлбэрээр ярина." },
+                        { text: "ХЯ3.2г. Үгийг оновчтой сонгож, дэлгэрэнгүй өгүүлбэрээр ярина." },
+                        { text: "ХЯ4.2г. Үзсэн, оролцсон, болсон үйл явдлыг нийлмэл өгүүлбэрээр ярина." },
+                        { text: "ХЯ1.2д. Энгийн өгүүлбэрийг давтан хэлнэ." },
+                        { text: "ХЯ2.2д. Үйл явдлыг тоочиж ярина." },
+                        { text: "ХЯ3.2д. Үйл явдлын эхлэл, өрнөл, төгсгөлийг дарааллын дагуу ярина." },
+                        { text: "ХЯ4.2д. Үйл явдлыг төсөөлж, зохиож ярина." }
+                    ]},
+                    { id: "lang_ai3", name: "Ай 3. Унших, бичих бэлтгэл", criteria: [
+                        { text: "ХЯ1.3а. Номыг сонирхож үзнэ." },
+                        { text: "ХЯ2.3а. Номын зургийг ажиглаж, ялган нэрлэнэ." },
+                        { text: "ХЯ3.3а. Номын зургаас үйл явдлыг ойлгож ярина." },
+                        { text: "ХЯ4.3а. Номын агуулга, үйл явдлыг тайлбарлан ярина." },
+                        { text: "ХЯ1.3б. Зурган тэмдэг тэмдэглэгээг таньж заана." },
+                        { text: "ХЯ2.3б. Орчинд байгаа тэмдэг, тэмдэглэгээг ялгана." },
+                        { text: "ХЯ3.б. Олон нийтийн газар хэрэглэгддэг тэмдэг, тэмдэглэгээг ялгаж нэрлэнэ." },
+                        { text: "ХЯ4.3б. Тэмдэг, тэмдэглэгээний утгыг тайлбарлаж хэрэглэнэ." },
+                        { text: "ХЯ1.3в. Харандаа барьж, цаасан дээр мөр гаргана." },
+                        { text: "ХЯ2.3в. Эрээчиж сараачиж бичнэ." },
+                        { text: "ХЯ3.3в. Энгийн зураасыг дагуулж зурна." },
+                        { text: "ХЯ4.3в. Дармал үсгийг дагуулж бичнэ" }
+                    ]}
+                ] 
+            },
+            nature: { 
+                name: "Байгаль, нийгмийн орчин", 
+                subDomains: [
+                    { id: "nat_ai1", name: "Ай 1. Байгалийн орчин", criteria: [
+                        { text: "БНО1.1а. Ойр орчны амьтныг таньж ялгана." },
+                        { text: "БНО2.1а. Ойр орчны амьтны үр төлийг нэрлэн, ялгаж танина." },
+                        { text: "БНО3.1а. Амьтдын амьдрах орчныг ялган таньж, тэднийг хамгаалах аргыг нэрлэнэ." },
+                        { text: "БНО4.1а. Амьтдын үр төл, идэш тэжээл, амьдрах орчны ялгааг тайлбарлаж, хайрлан хамгаалах үйлд оролцоно." },
+                        { text: "БНО1.1б. Өдөр тутам хэрэглэдэг жимс, хүнсний ногоог таньж нэрлэнэ." },
+                        { text: "БНО2.1б. Тасалгааны ургамлын тоосыг арчих, услах үйлд оролцоно." },
+                        { text: "БНО3.1б. Тасалгааны ургамлын гол хэсгүүд (үндэс, иш, навч, цэцэг)-ийг нэрлэж, арчлах, ургуулах үйлд оролцоно." },
+                        { text: "БНО4.1б. Ургамлын ургалтад юу хэрэгтэй болохыг тодорхойлж, тарьж ургуулах үйлд оролцоно." },
+                        { text: "БНО1.1в. Ойр орчны эд зүйлс, тоглоомыг мэдэрч нэрлэнэ." },
+                        { text: "БНО2.1в. Ойр орчны эд зүйлс, тоглоомын шинжийг мэдэрч, нэрлэн, зориулалтаар нь ашиглана." },
+                        { text: "БНО3.1в. Мэдрэхүйн тусламжтайгаар юмсын шинж чанарыг ялгаж харьцуулна." },
+                        { text: "БНО4.1в. Ойр орчны эд юмс, тоглоомын материалын шинж чанарыг (төмөр, цаас, шил, даавуу, мод, чулуу) ялгаж, нэрлэнэ." },
+                        { text: "БНО1.1г. Байгалийн үзэгдлийг зааж нэрлэнэ." },
+                        { text: "БНО2.1г. Байгалийн үзэгдлийг ялган таньж, ажиглаж ярилцана." },
+                        { text: "БНО3.1г. Цаг агаарын байдлыг зураг, тэмдэг ашиглан илэрхийлж, тохирсон хувцас болон хийх үйл ажиллагаагаа сонгож тайлбарлана." },
+                        { text: "БНО4.1г. Улирлын онцлогоос хамаарч амьтан, ургамал, хүмүүсийн амьдралд гарч буй өөрчлөлтийг тайлбарлаж, өөрийн хийх үйлийг тохируулан сонгоно." }
+                    ]},
+                    { id: "nat_ai2", name: "Ай 2. Нийгмийн орчин", criteria: [
+                        { text: "БНО1.2а. Өөрийн нэр, нас, бие, эрхтнээ нэрлэж, тоглоом, эд зүйлсээ танина." },
+                        { text: "БНО2.2а. Нэр, насаа хэлж, өөрийн болон бусдын эд зүйлс, тоглоомыг ялгана." },
+                        { text: "БНО3.2а. Өөрийн хүйс, төрсөн жилээ хэлж, ангидаа болон гэртээ хийх дуртай зүйлээ тайлбарлана." },
+                        { text: "БНО4.2а. Өөрийнхөө тухай танилцуулж, бусдын сонирхол, ялгаатай байдалд хүндэтгэлтэй хандана." },
+                        { text: "БНО1.2б. Гэр бүлийн гишүүдээ нэрлэж, тэдний хийж буй үйлдлийг дуурайж тоглоно." },
+                        { text: "БНО2.2б. Гэр бүлийн гишүүдийн талаар ярьж, тэдний ажил мэргэжил, хэрэглэдэг хувцас, ажлын багаж хэрэгслийг ялган танина." },
+                        { text: "БНО3.2б. Өөрийн гэр бүлийг танилцуулж, ойр орчны хүмүүсийн ажил мэргэжлийг ялган ойлгож, гэрийн ажилд оролцоно." },
+                        { text: "БНО4.2б. Өөрийн болон бусдын гэр бүлийг хүндэтгэн ойлгож, ажил хөдөлмөрт нь туслан оролцоно." },
+                        { text: "БНО1.2в. Гэрт болон ангидаа эд зүйлсийн байрлалыг мэдэж, багшийн өгсөн энгийн зааврыг биелүүлнэ." },
+                        { text: "БНО2.2в. Өөрийн орчны эд зүйлсийг таньж, байршил, зориулалтыг ойлгож, цэцэрлэг, гэр бүлийн орчинд мөрдөх энгийн заавар, дүрмийг дагаж мөрдөнө." },
+                        { text: "БНО3.2в. Ойр орчны үйлчилгээний газар (дэлгүүр, эмийн сан, эмнэлэг, номын сан) хүмүүс юу хийдэг, ямар зориулалттайг ялгаж, тухайн газрын дүрмийг баримтална." },
+                        { text: "БНО4.2в. Амьдардаг орчныхоо соёл, дурсгалт газрыг нэрлэж, нийтийн орчинд бусдыг хүндэтгэн харилцана." },
+                        { text: "БНО1.2г. Өөрийн хэрэглэсэн эд зүйлс, тоглоомоо байранд нь хурааж, зориулалтын саванд хог хаяхыг оролдоно." },
+                        { text: "БНО2.2г. Өөрийн тоглоом, эд зүйлсээ зориулалтын дагуу хэрэглэж, ус хэмнэх, хогоо ангилж хаяхдаа бусдын тусламжтай хийнэ." },
+                        { text: "БНО3.2г. Орчны эд зүйлсийг зориулалтын дагуу ашиглаж, ус хэмнэх, хог хаягдал ялгаж хаях үйлийг бие даан хийнэ." },
+                        { text: "БНО4.2г. Орчны эд зүйлсийг гамтай хэрэглэж, ус бохирдуулахгүй байх, хог хаягдал ангилах үйлд хариуцлагатай хандана." },
+                        { text: "БНО1.2д. Үндэсний хувцас (малгай, дээл, гутал)-ыг таньж нэрлэнэ." },
+                        { text: "БНО2.2д. Үндэсний хувцас, цагаан идээ, тоглоом, наадгайг таньж, баяр ёслолын зарим үйлийг даган дуурайшна." },
+                        { text: "БНО3.2д. Гэр бүлийн орчинд уламжлалт баярыг хэрхэн тэмдэглэдэг талаар өөрийн үгээр тайлбарлаж, ардын тоглоом, наадгайгаар наадна." },
+                        { text: "БНО4.2д. Өөрийн үндэсний өв соёлыг бусад үндэстний соёлоос ялган таньж, уламжлалт зан үйл, ёс заншлаар бахархана." }
+                    ]}
+                ] 
+            },
+            math: { 
+                name: "Математик", 
+                subDomains: [
+                    { id: "math_ai1", name: "Ай 1. Тоо тоолол", criteria: [
+                        { text: "МАТ1.1а. Гэр, цэцэрлэгийн орчин тойронд байх юмсаас 1 эсвэл 3 ширхэг тоглоом, юмсыг заах, нэг гэж хэлнэ." },
+                        { text: "МАТ2.1а. 5 хүртэлх тооны тоглоом, юмсыг тоолох, олон ба цөөн тооны тоглоом, юмсыг зааж хэлнэ." },
+                        { text: "МАТ3.1а. 10 хүртэлх тоог цээжээр тоолох, 5 хүртэлх тооны юмсыг оноож тоолох, өгсөн тооноос эхэлж 1-ээр нэмэгдүүлэн тоолох, тоог жишнэ." },
+                        { text: "МАТ4.1а. 20 хүртэлх тоог цээжээр тоолох, 10 хүртэлх тооны юмсыг оноож тоолох, тоог таних, өгсөн тооноос эхэлж 1-ээр нэмэгдүүлэн, хорогдуулан тоолох, тоог жишнэ." },
+                        { text: "МАТ2.1б. Дараалан байрлуулсан тоглоом, юмсын зүй тогтлыг ажиглаж, дуурайна." },
+                        { text: "МАТ3.1б. Дараалан байрлуулсан тоглоом, дүрсүүдийн зүй тогтлыг ажиглаж үргэлжлүүлнэ." },
+                        { text: "МАТ4.1б. Тоглоом, дүрсүүдээр зүй тогтол үүсгэн тайлбарлана. 10 хүртэлх тооны дарааллаас орхигдсон тоог тодорхойлно." }
+                    ]},
+                    { id: "math_ai2", name: "Ай 2. Хэмжигдэхүүн", criteria: [
+                        { text: "МАТ2.2а. 3 хүртэлх тооны тоглоом юмсыг уртаар нь харьцуулна." },
+                        { text: "МАТ3.2а. Тоглоом юмсын урт, хүндийг харьцуулж, тайлбарлана." },
+                        { text: "МАТ4.2а. Юмсын урт, хүнд, багтаамжийг таамаглаад, харьцуулж, тайлбарлана." },
+                        { text: "МАТ2.2б. Өөрийн хийдэг үйлийг өглөө, оройтой холбож нэрлэнэ." },
+                        { text: "МАТ3.2б. Өдөр тутмын хийдэг үйлийг дараалуулна." },
+                        { text: "МАТ4.2б. Долоо хоногийн өдрийг дарааллаар нь нэрлэж, тухайн өдрүүдэд хийдэг танил үйл явдалтай холбож танилцуулна." }
+                    ]},
+                    { id: "math_ai3", name: "Ай 3. Геометр", criteria: [
+                        { text: "МАТ1.3а. Тоглоом юмсаас тодорхой шинжтэй зүйлийг ялгана." },
+                        { text: "МАТ2.3а. Тоглоом юмсыг тодорхой шинжээр хоёр хэсэгт ангилна." },
+                        { text: "МАТ3.3а. Тоглоом юмсаас нэг шинжээр 4 хүртэлх хэсэгт ангилж, байрлуулна." },
+                        { text: "МАТ4.3а. Тоглоом юмсын ижил ялгаатай шинжийг нэрлэж, ангилж, тайлбарлана." },
+                        { text: "МАТ2.3б. Бөмбөг, шоог ялгаж нэрлэнэ." },
+                        { text: "МАТ3.3б. Дугуй, гурвалжин, дөрвөлжин дүрсүүдийг нэрлэж, дүрс, биетийг ялгана." },
+                        { text: "МАТ4.3б. Дүрс, биетийг ялгаж, савх, харандаа зэргийг ашиглан дүрсийг бүтээх, зохиомж хийнэ." },
+                        { text: "МАТ1.3в. Юмсын байршлыг танина. (дээр, доор)" },
+                        { text: "МАТ2.3в. Юмсын байршлыг нэрлэнэ. (дотор, гадна)" },
+                        { text: "МАТ3.3в. Чиглэл, байршлын дагуу үйлдэл хийнэ. (өмнө, хойно, дээшээ, доошоо)" },
+                        { text: "МАТ4.3в. Чиглэл, байршлыг ялгаж хэрэглэнэ. (баруун, зүүн, баруун тийш, зүүн тийш)" }
+                    ]},
+                    { id: "math_ai4", name: "Ай 4. Цахим ертөнц ба алхам", criteria: [
+                        { text: "МАТ3.4а. Ухаалаг төхөөрөмжийг таньж, хэрэглээ зориулалтаар нь ялгаж нэрлэнэ." },
+                        { text: "МАТ4.4а. Ухаалаг төхөөрөмжийн дүрс, тэмдэг, тэмдэглэгээг таньж, зориулалтаар хэрэглэж, тайлбарлана." },
+                        { text: "МАТ3.4б. Зурган зааварчилгааг ажиглаж, дарааллын дагуу дуурайна." },
+                        { text: "МАТ4.4б. Чиглүүлэг зааврыг дагаж дарааллын дагуу үйлдлийг гүйцэтгэнэ." }
+                    ]}
+                ] 
+            },
+            art: { 
+                name: "Зураг, урлал", 
+                subDomains: [
+                    { id: "art_ai1", name: "Ай 1. Мэдрэх, илэрхийлэх", criteria: [
+                        { text: "ЗУ1.1а. Уран зургийн бүтээлийг ажиглаж хүн, амьтныг ялгаж танина." },
+                        { text: "ЗУ2.1а. Уран зураг, баримлын бүтээлийг ажиглаж хүн, амьтан, эд юмсыг ялгаж нэрлэнэ." },
+                        { text: "ЗУ3.1а. Уран зураг, баримлын бүтээлийг ажиглаж өөрт төрсөн сэтгэгдлээ илэрхийлнэ." },
+                        { text: "ЗУ4.1а. Уран зургийн үйл явдал, баримлын дүрийн талаарх ойлголтоо бусдад тайлбарлана." }
+                    ]},
+                    { id: "art_ai2", name: "Ай 2. Хийж гүйцэтгэх", criteria: [
+                        { text: "ЗУ1.2а. Зурах хэрэгслүүдийг ашиглан зурааслаж дүрсэлнэ." },
+                        { text: "ЗУ2.2а. Зураас, дүрсээр өөрийн бодол, төсөөллөө илэрхийлнэ." },
+                        { text: "ЗУ3.2а. Өөрийн бодол төсөөллөөр зохиомжлон зурна." },
+                        { text: "ЗУ4.2а. Сэдвийн хүрээнд хүрээлэн буй орчин, хүн, амьтан, эд юмсыг зохиомжлон зурна." },
+                        { text: "ЗУ1.2б. Бүтээлээ үндсэн өнгөөр бусдын дэмжлэгтэй будна." },
+                        { text: "ЗУ2.2б. Бүтээлээ үндсэн өнгөөр бие дааж будна." },
+                        { text: "ЗУ3.2б. Өөрийн бүтээлдээ тохирох өнгийг сонгож будна." },
+                        { text: "ЗУ4.2б. Өөрийн бүтээлээ үндсэн болон үүсмэл өнгөөр зохиомжлон будна." },
+                        { text: "ЗУ1.2в. Бусдын дэмжлэгтэйгээр толбо, дардсаар зурна." },
+                        { text: "ЗУ2.2в. Бие дааж толбо, дардсаар зурна." },
+                        { text: "ЗУ3.2в. Бүтээлээ толбо, дардсаар чимэглэнэ." },
+                        { text: "ЗУ4.2в. Зураг бүтээлээ хээ угалзаар чимэглэнэ." },
+                        { text: "ЗУ1.2г. Баримлын шавраар нэг бүтэцтэй зүйлийг бусдын дэмжлэгтэй барина." },
+                        { text: "ЗУ2.2г. Баримлын шавраар хоёр хэсгээс бүтсэн зүйлийг бие дааж барина." },
+                        { text: "ЗУ3.2г. Баримлын шавар, элс, гурилан зуурмагаар хүн, амьтан, эд юмсыг зохиомжлон барина." },
+                        { text: "ЗУ4.2г. Баримлын шаврыг байгалийн материалтай хослуулж сэдэвт баримал барина." },
+                        { text: "ЗУ1.2д. Бэлдэц дүрсээр бусдын дэмжлэгтэй нааж бүтээл урлана." },
+                        { text: "ЗУ2.2д. Бэлдэц дүрсээр бие даан нааж бүтээл урлана." },
+                        { text: "ЗУ3.2д. Нугалах, эвхэх, хайчлах аргаар хавтгай болон биет наамлын бүтээл урлана." },
+                        { text: "ЗУ4.2д. Сэдвийн хүрээнд өөрийн бодол төсөөллөөр наамлын бүтээл урлана." },
+                        { text: "ЗУ1.2е. Өрж байгуулах, эвлүүлэх аргаар тоглоом, эд юмсыг бусдын дэмжлэгтэй бүтээнэ." },
+                        { text: "ЗУ2.2е. Өрж байгуулах, эвлүүлж угсрах аргаар бие дааж тоглоом, эд юмсыг зохион бүтээнэ." },
+                        { text: "ЗУ3.2е. Тоглоом болон байгалийн материал, дахин ашиглах материалаас сонгож хүрээлэн буй орчноо бүтээнэ." },
+                        { text: "ЗУ4.2е. Тоглоом болон байгалийн материал, дахин ашиглах материалаас сонгож шинэ загвар бүтээнэ." }
+                    ]}
+                ] 
+            },
+            music: { 
+                name: "Хөгжим", 
+                subDomains: [
+                    { id: "mus_ai1", name: "Ай 1. Хөгжмийн илэрхийлэл", criteria: [
+                        { text: "ХӨГ1.1а. Хүн, амьтны дуу авиаг ялган таньдаг болно." },
+                        { text: "ХӨГ2.1а. Байгаль, эд юмсын дуу чимээг таньж ялгана." },
+                        { text: "ХӨГ3.1а. Хөгжмийн энгийн зэмсгийн дуу чимээг ялган таньж, дуугаралтын чанга сул хүчийг тодорхойлно." },
+                        { text: "ХӨГ4.1а. Хөгжмийн энгийн зэмсгийг дуугаралтаар ялгаж, өнгө аясыг тодорхойлно." },
+                        { text: "ХӨГ1.1б. Дууг анхааралтай сонсож, зарим үг, авиаг дуурайн хэлж, аялна." },
+                        { text: "ХӨГ2.1б. Дууны аялгууг дагаж, хамтдаа дуулна." },
+                        { text: "ХӨГ3.1б. Богино үгтэй дууг бусадтай хамтран дуулна." },
+                        { text: "ХӨГ4.1б. Дуу, аялгууг гарын дохиогоор дуулж, аялна." },
+                        { text: "ХӨГ1.1в. Дуу, аялгууны хэмнэлд тохируулан хөдөлгөөн хийнэ." },
+                        { text: "ХӨГ2.1в. Дуу, аялгууны хэмнэлийг мэдэрч хамтран тоглоно." },
+                        { text: "ХӨГ3.1в. Дуу, аялгууны хэмнэлийг ялгаж, дагаж тоглоно." },
+                        { text: "ХӨГ4.1в. Дуу, аялгууны хэмнэлийг хөгжмийн энгийн зэмсгээр хамтран хөгжимдөнө." },
+                        { text: "ХӨГ2.1г. Дуу, аялгууг мэдэрч, тохирсон хөдөлгөөн хийнэ." },
+                        { text: "ХӨГ3.1г. Аялгууны өөрчлөлтийг мэдэрч хөдөлгөөнөөр илэрхийлнэ." },
+                        { text: "ХӨГ4.1г. Хэмнэл, хурд, өнгө аясад тохируулан хөдөлгөөнөө хийнэ." },
+                        { text: "ХӨГ2.1д. Үлгэр зохиол, дуу хөгжмийн танил дүрийг дуурайж, харилцан тоглоно." },
+                        { text: "ХӨГ3.1д. Үлгэр зохиол, дуу, аялгууны дүрийн онцлогийг илэрхийлж тоглоно." },
+                        { text: "ХӨГ4.1д. Дүрийн зан чанар, харилцааг илэрхийлж хамтран тоглоно." }
+                    ]}
+                ] 
+            }
+        };
+
+        function switchTab(tabId) {
+            document.getElementById('evaluationTab').classList.add('hidden');
+            document.getElementById('classReportTab').classList.add('hidden');
+            document.getElementById('periodReportTab').classList.add('hidden');
+
+            document.getElementById('btnEvalTab').className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-white/70 text-gray-600 hover:bg-orange-100/50 cursor-pointer";
+            document.getElementById('btnClassTab').className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-white/70 text-gray-600 hover:bg-orange-100/50 cursor-pointer";
+            document.getElementById('btnPeriodTab').className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-white/70 text-gray-600 hover:bg-orange-100/50 cursor-pointer";
+
+            document.getElementById(tabId).classList.remove('hidden');
+
+            if (tabId === 'evaluationTab') {
+                document.getElementById('btnEvalTab').className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-orange-500 text-white shadow-sm cursor-pointer";
+            } else if (tabId === 'classReportTab') {
+                document.getElementById('btnClassTab').className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-orange-500 text-white shadow-sm cursor-pointer";
+                renderClassBarChart();
+            } else if (tabId === 'periodReportTab') {
+                document.getElementById('btnPeriodTab').className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-orange-500 text-white shadow-sm cursor-pointer";
+                renderPeriodReports();
+            }
+        }
+
+        function changeUserRole() {
+            currentRole = document.getElementById('userRoleSelect').value;
+            const formContainer = document.getElementById('teacherEvaluationFormContainer');
+            const addStudentBtn = document.getElementById('addStudentBtn');
+            const editStudentBtn = document.getElementById('editStudentBtn');
+            const photoUploadLabel = document.getElementById('photoUploadLabel');
+
+            let show = (currentRole === 'teacher');
+            if (formContainer) formContainer.style.display = show ? 'block' : 'none';
+            if (addStudentBtn) addStudentBtn.style.display = show ? 'inline-block' : 'none';
+            if (editStudentBtn) editStudentBtn.style.display = show ? 'inline-block' : 'none';
+            if (photoUploadLabel) photoUploadLabel.style.display = show ? 'flex' : 'none';
+
+            if (selectedStudentId) selectStudent(selectedStudentId);
+        }
+
+        function renderStudentsList(filterText = "") {
+            const container = document.getElementById('studentCardsContainer');
+            container.innerHTML = '';
+            const filtered = studentsData.filter(s => s.name.toLowerCase().includes(filterText.toLowerCase()));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-4 italic">Сурагч олдсонгүй.</p>`;
+                return;
+            }
+
+            filtered.forEach(student => {
+                let isSelected = selectedStudentId === student.id;
+                let card = document.createElement('div');
+                card.className = `p-3 rounded-2xl border cursor-pointer transition flex items-center justify-between ${isSelected ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-orange-50/30 border-orange-100 hover:bg-orange-50 text-gray-800'}`;
+                card.onclick = () => selectStudent(student.id);
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${student.photo}" class="w-10 h-10 rounded-xl object-cover border border-orange-200">
+                        <div>
+                            <div class="text-xs font-bold">${student.name}</div>
+                            <div class="text-[10px] ${isSelected ? 'text-orange-100' : 'text-gray-400'}">Үнэлгээ: ${student.evaluations.length}</div>
+                        </div>
+                    </div>
+                    <span class="text-xs font-bold">➔</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterStudents() {
+            renderStudentsList(document.getElementById('studentSearchInput').value);
+        }
+
+        function selectStudent(id) {
+            selectedStudentId = id;
+            const student = studentsData.find(s => s.id === id);
+
+            document.getElementById('noStudentSelected').classList.add('hidden');
+            document.getElementById('activeStudentPanel').classList.remove('hidden');
+
+            document.getElementById('activeStudentName').innerText = student.name;
+            document.getElementById('activeStudentMeta').innerText = `Пороро бүлэг • Нас: ${student.age} • ${student.gender}`;
+            document.getElementById('activeStudentPhoto').src = student.photo;
+            document.getElementById('activeEvalCount').innerText = student.evaluations.length;
+
+            renderStudentHistory();
+            renderStudentProgressBars(student);
+            populateSubDomains();
+        }
+
+        function updateStudentPhoto(event) {
+            const file = event.target.files[0];
+            if (file && selectedStudentId) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const student = studentsData.find(s => s.id === selectedStudentId);
+                    student.photo = e.target.result;
+                    document.getElementById('activeStudentPhoto').src = student.photo;
+                    renderStudentsList(document.getElementById('studentSearchInput').value);
+                    alert("Зураг амжилттай шинэчлэгдлээ!");
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function openEditStudentModal() {
+            const student = studentsData.find(s => s.id === selectedStudentId);
+            if (!student) return;
+            let newName = prompt("Сурагчийн нэр засах:", student.name);
+            if (newName && newName.trim() !== "") {
+                student.name = newName.trim();
+                document.getElementById('activeStudentName').innerText = student.name;
+                renderStudentsList();
+            }
+        }
+
+        function populateSubDomains() {
+            const domainKey = document.getElementById('selectDomain').value;
+            const subSelect = document.getElementById('selectSubDomain');
+            subSelect.innerHTML = '';
+            const domainObj = curriculumDatabase[domainKey];
+            if (domainObj && domainObj.subDomains) {
+                domainObj.subDomains.forEach(sub => {
+                    let opt = document.createElement('option');
+                    opt.value = sub.id;
+                    opt.innerHTML = sub.name;
+                    subSelect.appendChild(opt);
+                });
+            }
+            populateCriteria();
+        }
+
+        function populateCriteria() {
+            const domainKey = document.getElementById('selectDomain').value;
+            const subId = document.getElementById('selectSubDomain').value;
+            const critSelect = document.getElementById('selectCriteria');
+            critSelect.innerHTML = '';
+            const domainObj = curriculumDatabase[domainKey];
+            if (domainObj) {
+                const subObj = domainObj.subDomains.find(s => s.id === subId);
+                if (subObj && subObj.criteria) {
+                    subObj.criteria.forEach(crit => {
+                        let opt = document.createElement('option');
+                        opt.value = crit.text;
+                        opt.innerHTML = crit.text;
+                        critSelect.appendChild(opt);
+                    });
+                }
+            }
+        }
+
+        function saveEvaluationForActiveStudent() {
+            if (!selectedStudentId) return;
+            const domainKey = document.getElementById('selectDomain').value;
+            const domainText = document.getElementById('selectDomain').selectedOptions[0].text;
+            const criteriaText = document.getElementById('selectCriteria').value;
+            const observationText = document.getElementById('teacherObservation').value;
+
+            let checkedLevels = [];
+            document.querySelectorAll('input[name="evalLevel"]:checked').forEach(cb => {
+                checkedLevels.push(parseInt(cb.value));
+            });
+
+            if (checkedLevels.length === 0) {
+                alert("Хамгийн багадаа 1 түвшин чеклэнэ үү!");
+                return;
+            }
+
+            const student = studentsData.find(s => s.id === selectedStudentId);
+            student.evaluations.unshift({
+                domainKey: domainKey,
+                domain: domainText,
+                criteria: criteriaText,
+                levels: checkedLevels,
+                note: observationText,
+                date: new Date().toISOString().split('T')[0]
+            });
+
+            document.querySelectorAll('input[name="evalLevel"]').forEach(cb => cb.checked = false);
+            document.getElementById('teacherObservation').value = '';
+            document.getElementById('activeEvalCount').innerText = student.evaluations.length;
+
+            renderStudentHistory();
+            renderStudentProgressBars(student);
+            renderStudentsList(document.getElementById('studentSearchInput').value);
+            alert("Үнэлгээ амжилттай хадгалагдлаа!");
+        }
+
+        function renderStudentHistory() {
+            const historyContainer = document.getElementById('activeStudentHistoryList');
+            historyContainer.innerHTML = '';
+            const student = studentsData.find(s => s.id === selectedStudentId);
+            if (!student || student.evaluations.length === 0) {
+                historyContainer.innerHTML = `<p class="text-xs text-gray-400 italic bg-white/50 p-3 rounded-xl border text-center">Үнэлгээ байхгүй байна.</p>`;
+                return;
+            }
+
+            student.evaluations.forEach(ev => {
+                let levelsBadge = ev.levels.map(l => `<span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-md text-[10px] font-bold">Түвшин ${l}</span>`).join(' ');
+                let card = document.createElement('div');
+                card.className = "p-3 bg-white border border-orange-100 rounded-xl text-xs space-y-1 shadow-2xs";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center font-bold text-orange-600">
+                        <span>${ev.domain}</span>
+                        <div class="flex items-center gap-1.5">${levelsBadge}<span class="text-[10px] text-gray-400">${ev.date}</span></div>
+                    </div>
+                    <div class="text-gray-800 font-medium">${ev.criteria}</div>
+                    ${ev.note ? `<div class="text-gray-500 italic bg-orange-50/30 p-2 rounded-lg mt-1">Тэмдэглэл: ${ev.note}</div>` : ''}
+                `;
+                historyContainer.appendChild(card);
+            });
+        }
+
+        function renderStudentProgressBars(student) {
+            const container = document.getElementById('studentProgressBarContainer');
+            container.innerHTML = '';
+            const domains = [
+                { key: "social", name: "Нийгэм-сэтгэл хөдлөл" },
+                { key: "math", name: "Математик" },
+                { key: "physical", name: "Хөдөлгөөн, эрүүл мэнд" },
+                { key: "language", name: "Хэл яриа" },
+                { key: "nature", name: "Байгаль, нийгмийн орчин" },
+                { key: "art", name: "Зураг, урлал" },
+                { key: "music", name: "Хөгжим" }
+            ];
+
+            domains.forEach(d => {
+                let evs = student.evaluations.filter(e => e.domainKey === d.key);
+                let scorePercent = 0;
+                let evalText = "Үнэлэгдээгүй";
+                if (evs.length > 0) {
+                    let allLevels = [];
+                    evs.forEach(e => allLevels.push(...e.levels));
+                    let maxLvl = Math.max(...allLevels);
+                    scorePercent = Math.round((maxLvl / 4) * 100);
+                    evalText = `Түвшин: ${maxLvl} (${scorePercent}%)`;
+                }
+                let barColor = scorePercent >= 75 ? "bg-emerald-500" : scorePercent >= 50 ? "bg-teal-500" : scorePercent > 0 ? "bg-amber-500" : "bg-gray-300";
+
+                let row = document.createElement('div');
+                row.className = "space-y-1";
+                row.innerHTML = `
+                    <div class="flex justify-between text-xs font-bold text-gray-700">
+                        <span>${d.name}</span>
+                        <span class="text-[10px] text-gray-500">${evalText}</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden border">
+                        <div class="${barColor} h-2.5 rounded-full transition-all duration-500" style="width: ${scorePercent}%"></div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function renderClassBarChart() {
+            const chartContainer = document.getElementById('verticalBarChartContainer');
+            const xAxisContainer = document.getElementById('chartXAxisLabels');
+            const detailedContainer = document.getElementById('classDetailedStatsContainer');
+            
+            chartContainer.innerHTML = '';
+            xAxisContainer.innerHTML = '';
+            detailedContainer.innerHTML = '';
+
+            const domains = [
+                { key: "social", name: "Нийгэм" },
+                { key: "math", name: "Математик" },
+                { key: "physical", name: "Хөдөлгөөн" },
+                { key: "language", name: "Хэл яриа" },
+                { key: "nature", name: "Байгаль" },
+                { key: "art", name: "Зураг, урлал" },
+                { key: "music", name: "Хөгжим" }
+            ];
+
+            let totalSum = 0;
+            let count = 0;
+
+            domains.forEach(d => {
+                let allLvls = [];
+                studentsData.forEach(s => {
+                    s.evaluations.filter(e => e.domainKey === d.key).forEach(ev => {
+                        allLvls.push(...ev.levels);
+                    });
+                });
+
+                let percent = 0;
+                if (allLvls.length > 0) {
+                    let avgLvl = allLvls.reduce((a, b) => a + b, 0) / allLvls.length;
+                    percent = Math.round((avgLvl / 4) * 100);
+                    totalSum += percent;
+                    count++;
+                }
+
+                let barWrapper = document.createElement('div');
+                barWrapper.className = "flex flex-col items-center h-full justify-end w-12 group relative";
+                
+                let barColor = percent >= 75 ? "bg-emerald-500" : percent >= 50 ? "bg-orange-500" : percent > 0 ? "bg-amber-400" : "bg-gray-200";
+
+                barWrapper.innerHTML = `
+                    <span class="text-[10px] font-bold text-gray-600 mb-1">${percent}%</span>
+                    <div class="w-8 ${barColor} rounded-t-xl transition-all duration-700 shadow-sm group-hover:brightness-110" style="height: ${Math.max(percent, 8)}%;"></div>
+                `;
+                chartContainer.appendChild(barWrapper);
+
+                let label = document.createElement('div');
+                label.className = "truncate text-gray-700 font-bold";
+                label.innerText = d.name;
+                xAxisContainer.appendChild(label);
+
+                let detailCard = document.createElement('div');
+                detailCard.className = "bg-white border border-orange-100 p-3 rounded-xl flex justify-between items-center text-xs";
+                detailCard.innerHTML = `
+                    <span class="font-bold text-gray-700">${d.name}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-24 bg-gray-100 h-2 rounded-full overflow-hidden">
+                            <div class="${barColor} h-2 rounded-full" style="width: ${percent}%"></div>
+                        </div>
+                        <span class="font-extrabold text-orange-600">${percent}%</span>
+                    </div>
+                `;
+                detailedContainer.appendChild(detailCard);
+            });
+
+            document.getElementById('classAveragePercent').innerText = count > 0 ? `${Math.round(totalSum / count)}%` : `0%`;
+        }
+
+        function renderPeriodReports() {
+            let container = document.getElementById('periodReportListContainer');
+            container.innerHTML = '';
+            periodReportsData.forEach(rep => {
+                let card = document.createElement('div');
+                card.className = "bg-orange-50/20 border border-orange-200 p-5 rounded-2xl space-y-3";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-xs font-extrabold text-orange-700">${rep.periodTitle}</h4>
+                        <span class="text-[10px] text-gray-400 bg-orange-100 px-2.5 py-1 rounded-full font-bold">${rep.date}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div class="bg-white p-3 rounded-xl border"><b>🟢 Амжилттай:</b> ${rep.successfulTopics}</div>
+                        <div class="bg-white p-3 rounded-xl border"><b>⚠️ Сорилт:</b> ${rep.challenges}</div>
+                        <div class="bg-white p-3 rounded-xl border"><b>🚀 Төлөвлөгөө:</b> ${rep.nextSteps}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openAddPeriodModal() {
+            let title = prompt("Хугацаа болон сэдэв:");
+            if (!title) return;
+            let success = prompt("Амжилттай заасан сэдэв?:");
+            let challenge = prompt("Хүндрэл?:");
+            let next = prompt("Цаашид ажиллах төлөвлөгөө?:");
+
+            periodReportsData.unshift({
+                id: periodReportsData.length + 1,
+                periodTitle: title,
+                successfulTopics: success || "-",
+                challenges: challenge || "-",
+                nextSteps: next || "-",
+                date: new Date().toISOString().split('T')[0]
+            });
+            renderPeriodReports();
+        }
+
+        function openAddStudentModal() {
+            let name = prompt("Шинэ сурагчийн овог, нэр:");
+            if (name && name.trim() !== "") {
+                let newStudent = {
+                    id: studentsData.length + 1,
+                    name: name.trim(),
+                    gender: "Бүртгэгдсэн",
+                    age: 4,
+                    photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+                    evaluations: []
+                };
+                studentsData.push(newStudent);
+                renderStudentsList();
+                selectStudent(newStudent.id);
+            }
+        }
+
+        window.onload = function() {
+            renderStudentsList();
+            changeUserRole();
+        };
+    </script>
+</body>
+</html>

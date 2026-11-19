@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дуу хөгжмийн багшийн цахим самбар - Зүүн талын цэстэй загвар</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-50/70 via-purple-50/40 to-pink-50/40 min-h-screen font-sans text-gray-800">
+
+    <div class="flex min-h-screen">
+        
+        <!-- ЗҮҮН ТАЛЫН ЦЭС (SIDEBAR NAVIGATION) -->
+        <aside class="w-72 bg-white/95 backdrop-blur-md border-r border-indigo-100 flex flex-col justify-between p-5 hidden lg:flex shadow-xs sticky top-0 h-screen overflow-y-auto">
+            <div class="space-y-6">
+                <!-- Профайл толгой -->
+                <div class="flex items-center gap-3.5 pb-5 border-b border-indigo-100">
+                    <img id="sidebarAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-12 h-12 rounded-2xl object-cover border-2 border-indigo-400 shadow-sm" alt="Багш">
+                    <div>
+                        <h2 class="text-xs font-extrabold text-gray-900">Ж. Энхцэцэг</h2>
+                        <p class="text-[11px] text-indigo-600 font-medium">Дуу хөгжмийн багш</p>
+                    </div>
+                </div>
+
+                <!-- 10 Үндсэн цэс -->
+                <nav class="space-y-1 text-xs font-bold">
+                    <button onclick="openTab('tab1')" id="btn_tab1" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition bg-indigo-600 text-white shadow-sm cursor-pointer">
+                        <span>🏠</span> 1. Нүүр хуудас
+                    </button>
+                    <button onclick="openTab('tab2')" id="btn_tab2" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer">
+                        <span>🗓️</span> 2. Бүлэг, хуваарь
+                    </button>
+                    <button onclick="openTab('tab3')" id="btn_tab3" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer">
+                        <span>📚</span> 3. Сургалтын төлөвлөгөө
+                    </button>
+                    <button onclick="openTab('tab4')" id="btn_tab4" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer">
+                        <span>🎶</span> 4. Дуу, хөгжмийн сан
+                    </button>
+                    <button onclick="openTab('tab5')" id="btn_tab5" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer">
+                        <span>✅</span> 5. Хичээлийн хэрэгжилт
+                    </button>
+                    <button onclick="openTab('tab6')" id="btn_tab6" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer">
+                        <span>⭐</span> 6. Хүүхдийн ахиц
+                    </button>
+                    <button onclick="openTab('tab7')" id="btn_tab7" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer">
+                        <span>🎭</span> 7. Баяр, урлаг
+                    </button>
+                    <button onclick="openTab('tab8')" id="btn_tab8" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer">
+                        <span>🥁</span> 8. Зэмсэг, хэрэглэл
+                    </button>
+                    <button onclick="openTab('tab9')" id="btn_tab9" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer">
+                        <span>🤝</span> 9. Багш, эцэг эх
+                    </button>
+                    <button onclick="openTab('tab10')" id="btn_tab10" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer">
+                        <span>📊</span> 10. Тайлан, хэвлэх
+                    </button>
+                </nav>
+            </div>
+
+            <div class="pt-4 border-t border-indigo-100 text-[11px] text-gray-400 text-center">
+                СБӨБ Стандарт • Версия 2.0
+            </div>
+        </aside>
+
+        <!-- ҮНДСЭН АГУУЛГЫН ХЭСЭГ -->
+        <main class="flex-1 p-4 md:p-8 space-y-6 overflow-y-auto">
+            
+            <!-- Гар утасны хувилбарт зориулсан дээрх цэс (Responsive) -->
+            <div class="lg:hidden flex gap-2 overflow-x-auto pb-2 border-b border-indigo-200">
+                <button onclick="openTab('tab1')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white whitespace-nowrap">Нүүр</button>
+                <button onclick="openTab('tab2')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap">Хуваарь</button>
+                <button onclick="openTab('tab3')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap">Төлөвлөгөө</button>
+                <button onclick="openTab('tab4')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap">Дуу сан</button>
+                <button onclick="openTab('tab5')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap">Хэрэгжилт</button>
+                <button onclick="openTab('tab6')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap">Ахиц</button>
+                <button onclick="openTab('tab7')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap">Баяр</button>
+                <button onclick="openTab('tab8')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap">Зэмсэг</button>
+                <button onclick="openTab('tab9')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap">Хамтрах</button>
+                <button onclick="openTab('tab10')" class="mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap">Тайлан</button>
+            </div>
+
+            <!-- 1. НҮҮР ХУУДАС (DASHBOARD) -->
+            <div id="tab1" class="tab-content grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <div class="xl:col-span-8 bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-4">
+                    <h2 class="text-sm font-bold text-gray-800 border-b border-indigo-50 pb-3 flex items-center gap-2">
+                        <span>📅</span> Өнөөдрийн хичээлийн хуваарь & Шуурхай хандалт
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 bg-indigo-600 text-white text-[11px] font-bold rounded-lg">09:30 - 10:00</span>
+                                    <span class="text-xs font-bold text-indigo-900">Бэлтгэл бүлэг • Хөгжмийн заал</span>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1.5">Сэдэв: <b>«Дөрвөн цохилтыг давтъя»</b> (Бөмбөр, алга ташилт)</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="openTab('tab3')" class="px-3 py-1.5 bg-white text-indigo-700 border border-indigo-200 text-xs font-bold rounded-xl hover:bg-indigo-50 cursor-pointer">Төлөвлөгөө</button>
+                                <button onclick="openTab('tab5')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 cursor-pointer">Ирц, хэрэгжилт ➔</button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-purple-50/60 border border-purple-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 bg-purple-600 text-white text-[11px] font-bold rounded-lg">10:15 - 10:45</span>
+                                    <span class="text-xs font-bold text-purple-900">Ахлах бүлэг • Хөгжмийн заал</span>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1.5">Сэдэв: <b>«Намрын навчис»</b> дууны өнгө ялгах дасгал</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="openTab('tab3')" class="px-3 py-1.5 bg-white text-purple-700 border border-purple-200 text-xs font-bold rounded-xl hover:bg-purple-50 cursor-pointer">Төлөвлөгөө</button>
+                                <button onclick="openTab('tab5')" class="px-3 py-1.5 bg-purple-600 text-white text-xs font-bold rounded-xl hover:bg-purple-700 cursor-pointer">Ирц, хэрэгжилт ➔</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="xl:col-span-4 space-y-5">
+                    <!-- Ойрын арга хэмжээний явц -->
+                    <div class="bg-white/90 backdrop-blur-md rounded-3xl p-5 border border-indigo-100 shadow-sm space-y-3">
+                        <h3 class="text-xs font-bold text-gray-800 uppercase flex items-center gap-2"><span>📈</span> Ойрын арга хэмжээний явц</h3>
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-indigo-900">Шинэ жилийн тайлант тоглолт</span>
+                                <span class="text-indigo-600">75%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2.5">
+                                <div class="bg-indigo-600 h-2.5 rounded-full" style="width: 75%"></div>
+                            </div>
+                            <p class="text-[11px] text-gray-500 mt-1.5">Бэлтгэл болон Ахлах бүлгийн бүжгийн сургуулилт дууссан.</p>
+                        </div>
+                    </div>
+
+                    <!-- Шуурхай мэдэгдэл -->
+                    <div class="bg-amber-50/90 rounded-3xl p-5 border border-amber-200/80 space-y-2.5">
+                        <h3 class="text-xs font-bold text-amber-900 uppercase flex items-center gap-2"><span>🔔</span> Шуурхай мэдэгдэл</h3>
+                        <div class="p-3 bg-white/90 rounded-xl text-xs space-y-1 border border-amber-100 shadow-2xs">
+                            <span class="text-[10px] font-bold text-amber-700">Арга зүйч (Өнөөдөр 08:40):</span>
+                            <p class="text-gray-700">Бэлтгэл бүлгийн хэмнэлийн дасгал дээр хөгжмийн зэмсгийг ээлжлэн тоглуулах аргачлалыг түлхүү ашиглаарай.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. БҮЛЭГ, ХИЧЭЭЛИЙН ХУВААРЬ -->
+            <div id="tab2" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-5">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-indigo-50 pb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-gray-800">🗓️ Бүлэг, хичээлийн хуваарь тохируулах</h2>
+                        <p class="text-xs text-gray-500">Хуваарьт өөрчлөлт оруулж хадгалахад тухайн бүлгийн багшид автомат мэдэгдэл очно.</p>
+                    </div>
+                    <button onclick="alert('✅ Хуваарийн өөрчлөлт хадгалагдаж, бүлгийн багш нарт автомат мэдэгдэл илгээгдлээ!')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 cursor-pointer">💾 Хуваарь хадгалах</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border border-indigo-100 rounded-2xl overflow-hidden bg-white">
+                        <thead class="bg-indigo-50 text-indigo-900 font-bold">
+                            <tr>
+                                <th class="p-3">Бүлэг</th>
+                                <th class="p-3">Гараг</th>
+                                <th class="p-3">Цаг</th>
+                                <th class="p-3">Байршил</th>
+                                <th class="p-3">Дэлгэрэнгүй</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-indigo-50">
+                            <tr>
+                                <td class="p-3 font-bold text-indigo-700">Бэлтгэл бүлэг (25 хүүхэд)</td>
+                                <td class="p-3"><select class="border rounded-lg p-1 bg-white"><option>Даваа, Лхагва</option><option>Мягмар, Пүрэв</option></select></td>
+                                <td class="p-3"><input type="text" value="09:30 - 10:00" class="border rounded-lg p-1 w-28 bg-white"></td>
+                                <td class="p-3"><select class="border rounded-lg p-1 bg-white"><option>Хөгжмийн заал</option><option>Ангид</option></select></td>
+                                <td class="p-3"><button onclick="alert('Бэлтгэл бүлэг:\n- Өмнөх сэдэв: Хэмнэл таних\n- Дараагийн сэдэв: Дөрвөн цохилтыг давтъя')" class="text-indigo-600 font-bold underline cursor-pointer">Бүлгийн мэдээлэл</button></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-indigo-700">Ахлах бүлэг (28 хүүхэд)</td>
+                                <td class="p-3"><select class="border rounded-lg p-1 bg-white"><option>Мягмар, Пүрэв</option><option>Даваа, Лхагва</option></select></td>
+                                <td class="p-3"><input type="text" value="10:15 - 10:45" class="border rounded-lg p-1 w-28 bg-white"></td>
+                                <td class="p-3"><select class="border rounded-lg p-1 bg-white"><option>Хөгжмийн заал</option><option>Ангид</option></select></td>
+                                <td class="p-3"><button onclick="alert('Ахлах бүлэг:\n- Өмнөх сэдэв: Дууны өнгө\n- Дараагийн сэдэв: Намрын навчис')" class="text-indigo-600 font-bold underline cursor-pointer">Бүлгийн мэдээлэл</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. СУРГАЛТЫН ТӨЛӨВЛӨГӨӨ -->
+            <div id="tab3" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-5">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-indigo-50 pb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-gray-800">📚 Сургалтын төлөвлөгөө (5 төрөл)</h2>
+                        <p class="text-xs text-gray-500">Хадгалсан төлөвлөгөө Эрхлэгч, Арга зүйч болон таны системд харагдана.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <select id="planCategory" class="text-xs border border-indigo-300 rounded-xl px-3 py-2 bg-indigo-50 font-bold text-indigo-800">
+                            <option value="Өдөр тутмын төлөвлөгөө">4. Өдөр тутмын төлөвлөгөө</option>
+                            <option value="Жилийн ажлын төлөвлөгөө">1. Жилийн ажлын төлөвлөгөө</option>
+                            <option value="Сарын ажлын төлөвлөгөө">2. Сарын ажлын төлөвлөгөө</option>
+                            <option value="Долоо хоногийн төлөвлөгөө">3. Долоо хоногийн төлөвлөгөө</option>
+                            <option value="Өдрийн дэглэм">5. Өдрийн дэглэм</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 space-y-3 bg-indigo-50/40 p-4 rounded-2xl border border-indigo-100">
+                        <h3 class="text-xs font-bold text-indigo-900">✍️ Шинэ төлөвлөгөө боловсруулах</h3>
+                        <input type="text" id="planTitle" placeholder="Төлөвлөгөөний сэдэв (Жишээ: Дөрвөн цохилтыг давтъя)..." class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white">
+                        <textarea id="planBody" rows="4" placeholder="Үйл ажиллагааны дараалал, арга зүй, хэрэглэгдэхүүн..." class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white"></textarea>
+                        
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-1">
+                            <label class="text-xs font-bold text-indigo-700 cursor-pointer bg-white px-3 py-2 rounded-xl border border-indigo-200 shadow-2xs">
+                                📎 Word, PDF, Excel, Зураг хавсаргах
+                                <input type="file" accept=".doc,.docx,.pdf,.xls,.xlsx,.jpg,.png" class="hidden" onchange="alert('Файл амжилттай хавсаргагдлаа!')">
+                            </label>
+                            <button onclick="addPlan()" class="px-5 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 cursor-pointer shadow-sm">💾 Хадгалах</button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 space-y-3">
+                        <h3 class="text-xs font-bold text-gray-700">📋 Хадгалагдсан төлөвлөгөөнүүд</h3>
+                        <div id="planList" class="space-y-2.5">
+                            <div class="p-3.5 bg-white border border-indigo-100 rounded-2xl space-y-1.5 shadow-2xs">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md">Өдөр тутмын төлөвлөгөө</span>
+                                    <span class="text-[10px] text-emerald-600 font-bold">✓ Арга зүйч хянасан</span>
+                                </div>
+                                <h4 class="text-xs font-bold text-gray-800">Дөрвөн цохилтыг давтъя (Бэлтгэл бүлэг)</h4>
+                                <p class="text-[11px] text-gray-600">Эхлээд алга ташиж, дараа нь бөмбөрөөр 4 цохилтыг ээлжлэн давтана.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ДУУ, ХӨГЖИМ, ХӨДӨЛГӨӨНИЙ САН -->
+            <div id="tab4" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-5">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-indigo-50 pb-3">
+                    <h2 class="text-base font-bold text-gray-800">🎶 Дуу, хөгжим, хөдөлгөөний цахим сан</h2>
+                    <div class="flex gap-2">
+                        <select class="text-xs border border-indigo-200 rounded-xl px-3 py-1.5 bg-white"><option>Бүх насны бүлэг</option><option>Бага</option><option>Дунд</option><option>Ахлах</option><option>Бэлтгэл</option></select>
+                        <select class="text-xs border border-indigo-200 rounded-xl px-3 py-1.5 bg-white"><option>Бүх улирал</option><option>Намар</option><option>Өвөл</option><option>Хавар</option></select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl border border-indigo-100 bg-indigo-50/40 space-y-2.5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded">Дуу • Ахлах, Бэлтгэл • Намар</span>
+                                <h4 class="text-sm font-bold text-gray-800 mt-1">«Алтан намар» (Үг, ая, фонограмм)</h4>
+                            </div>
+                            <button onclick="linkToPlan('Алтан намар')" class="px-2.5 py-1.5 bg-indigo-600 text-white text-[11px] font-bold rounded-xl hover:bg-indigo-700 cursor-pointer">+ Төлөвлөгөөнд холбох</button>
+                        </div>
+                        <audio controls class="w-full h-8"><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg"></audio>
+                    </div>
+
+                    <div class="p-4 rounded-2xl border border-indigo-100 bg-indigo-50/40 space-y-2.5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">Хэмнэлийн дасгал • Бүх бүлэг</span>
+                                <h4 class="text-sm font-bold text-gray-800 mt-1">«Дөрвөн цохилтыг давтъя» (Бөмбөр)</h4>
+                            </div>
+                            <button onclick="linkToPlan('Дөрвөн цохилтыг давтъя')" class="px-2.5 py-1.5 bg-indigo-600 text-white text-[11px] font-bold rounded-xl hover:bg-indigo-700 cursor-pointer">+ Төлөвлөгөөнд холбох</button>
+                        </div>
+                        <p class="text-xs text-gray-600">Заавар: Багш 4 удаа жигд товшиход хүүхдүүд сонсоод яг ижил хэмнэлээр давтана.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. ХИЧЭЭЛИЙН ХЭРЭГЖИЛТ, ИРЦ -->
+            <div id="tab5" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-5">
+                <h2 class="text-base font-bold text-gray-800 border-b border-indigo-50 pb-3">✅ Хичээлийн хэрэгжилт ба Ирцийн бүртгэл</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Бүлэг</label>
+                        <input type="text" value="Бэлтгэл бүлэг (Цэцэрлэгийн ирц: 24/25)" readonly class="w-full text-xs border border-gray-200 bg-gray-50 rounded-xl p-2.5 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Хөгжмийн хичээлд оролцсон хүүхэд</label>
+                        <input type="number" value="24" class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Хичээлийн төлөв</label>
+                        <select class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 font-bold text-emerald-700 bg-white">
+                            <option>Явуулсан</option>
+                            <option>Хойшилсон</option>
+                            <option>Нөхөж орсон</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Бодит гүйцэтгэл ба дараагийн удаа давтах зүйл</label>
+                    <textarea rows="2" class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white" placeholder="Жишээ: Хүүхдүүд алга ташилтаар сайн хийсэн, бөмбөр дээр дахин давтана."></textarea>
+                </div>
+                <button onclick="alert('✅ Хичээлийн хэрэгжилт болон ирц амжилттай хадгалагдлаа!')" class="px-5 py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-xl cursor-pointer shadow-sm">💾 Хэрэгжилт хадгалах</button>
+            </div>
+
+            <!-- 6. ХҮҮХДИЙН АЖИГЛАЛТ, АХИЦ -->
+            <div id="tab6" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-5">
+                <h2 class="text-base font-bold text-gray-800 border-b border-indigo-50 pb-3">⭐ Хүүхдийн ажиглалт, ахиц (Өмнөх тэмдэглэлтэй харьцуулах)</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-5 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 space-y-3">
+                        <h3 class="text-xs font-bold text-indigo-900">📝 Шинэ ажиглалт тэмдэглэх</h3>
+                        <input type="text" id="obsChild" value="Б. Тэмүүлэн (Бэлтгэл бүлэг)" class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white font-bold">
+                        <select id="obsSkill" class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white">
+                            <option>Хэмнэл дагах чадвар</option>
+                            <option>Дуулах өнгө</option>
+                            <option>Хөгжим сонсоод хөдөлгөөнөө өөрчлөх</option>
+                            <option>Хөгжмийн зэмсгээр ээлжлэн тоглох</option>
+                        </select>
+                        <textarea id="obsAction" rows="2" placeholder="Хүүхдийн хийсэн бодит үйл..." class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white">Багшийн тусламжгүйгээр дөрвөн цохилтыг бөмбөрөөр бие даан зөв давтсан.</textarea>
+                        <input type="text" id="obsSupport" placeholder="Багшийн үзүүлсэн дэмжлэг..." value="Дэмжлэг шаардаагүй (Бие даасан)" class="w-full text-xs border border-indigo-200 rounded-xl p-2.5 bg-white">
+                        <label class="flex items-center gap-2 text-xs text-gray-700">
+                            <input type="checkbox" checked class="rounded text-indigo-600"> Эцэг эхийн самбарт нийтлэх
+                        </label>
+                        <button onclick="addObservation()" class="w-full py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-xl cursor-pointer shadow-sm">💾 Ахицын тэмдэглэл хадгалах</button>
+                    </div>
+
+                    <div class="lg:col-span-7 space-y-3">
+                        <h3 class="text-xs font-bold text-gray-700">📊 Ахицын харьцуулалт: Б. Тэмүүлэн</h3>
+                        <div id="obsCompareBox" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="p-4 rounded-2xl border border-gray-200 bg-gray-50/80 space-y-1.5 shadow-2xs">
+                                <span class="text-[10px] font-bold bg-gray-200 text-gray-700 px-2 py-0.5 rounded">Өмнөх ажиглалт (2026-11-11)</span>
+                                <h4 class="text-xs font-bold text-gray-800">Хэмнэл дагах чадвар</h4>
+                                <p class="text-xs text-gray-600"><b>Бодит үйл:</b> Загвар үзүүлэхэд дөрвөн цохилтыг дарааллаар давтсан.</p>
+                                <p class="text-[11px] text-amber-700"><b>Дэмжлэг:</b> Багш гарын хөдөлгөөнөөр дохио өгсөн.</p>
+                            </div>
+                            <div class="p-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 space-y-1.5 shadow-2xs">
+                                <span class="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded">Сүүлийн ахиц (2026-11-18)</span>
+                                <h4 class="text-xs font-bold text-emerald-900">Хэмнэл дагах чадвар ⬆️</h4>
+                                <p class="text-xs text-gray-700"><b>Бодит үйл:</b> Багшийн тусламжгүйгээр бөмбөрөөр бие даан зөв давтсан.</p>
+                                <p class="text-[11px] text-emerald-700"><b>Дүгнэлт:</b> Бие даан гүйцэтгэх чадвар ахисан.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. БАЯР, УРЛАГИЙН АРГА ХЭМЖЭЭ -->
+            <div id="tab7" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-gray-800 border-b border-indigo-50 pb-3">🎭 Баяр, урлагийн арга хэмжээний төлөвлөлт</h2>
+                <div class="p-4 rounded-2xl border border-indigo-100 bg-indigo-50/40 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-sm font-bold text-indigo-900">«Өвлийн өвгөний бэлэг» тайлант өдөрлөг</h4>
+                        <span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-lg">Бэлтгэл: 75%</span>
+                    </div>
+                    <p class="text-xs text-gray-600">• <b>Бэлтгэл бүлэг:</b> «Цасан ширхэг» бүжиг (Хувцас: Цагаан даашинз) — Бэлэн болсон</p>
+                    <p class="text-xs text-gray-600">• <b>Ахлах бүлэг:</b> «Шинэ жил ирлээ» найрал дуу — Давтлага хийж байгаа</p>
+                </div>
+            </div>
+
+            <!-- 8. ХӨГЖИМИЙН ЗЭМСЭГ, ХЭРЭГЛЭГЭХҮҮН -->
+            <div id="tab8" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-5">
+                <h2 class="text-base font-bold text-gray-800 border-b border-indigo-50 pb-3">🥁 Хөгжмийн зэмсэг, техник хэрэгсэл & Няравт хүсэлт илгээх</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="p-4 rounded-2xl border border-indigo-100 bg-white shadow-2xs">
+                        <div class="font-bold text-gray-800">Жижиг бөмбөр</div>
+                        <div class="text-gray-500 mt-1">Нийт: 15 | Ашиглах: 13 | Эвдэрсэн: <span class="text-red-600 font-bold">2</span></div>
+                    </div>
+                    <div class="p-4 rounded-2xl border border-indigo-100 bg-white shadow-2xs">
+                        <div class="font-bold text-gray-800">Модон халбага</div>
+                        <div class="text-gray-500 mt-1">Нийт: 30 | Ашиглах: 30 | Эвдэрсэн: 0</div>
+                    </div>
+                    <div class="p-4 rounded-2xl border border-indigo-100 bg-white shadow-2xs">
+                        <div class="font-bold text-gray-800">Утасгүй микрофон</div>
+                        <div class="text-gray-500 mt-1">Нийт: 2 | Ашиглах: 2 | Эвдэрсэн: 0</div>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="nyravReq" placeholder="Няравт илгээх хүсэлт (Жишээ: 2 ширхэг жижиг бөмбөр шинээр олгох / засварлуулах)..." class="flex-1 text-xs border border-indigo-200 rounded-xl p-2.5 bg-white">
+                    <button onclick="sendNyrav()" class="px-5 py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-xl cursor-pointer shadow-sm">📨 Няравт цахим хүсэлт илгээх</button>
+                </div>
+            </div>
+
+            <!-- 9. БАГШ, ЭЦЭГ ЭХТЭЙ ХАМТРАХ -->
+            <div id="tab9" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-4">
+                <h2 class="text-base font-bold text-gray-800 border-b border-indigo-50 pb-3">🤝 Бүлгийн багш болон Эцэг эхэд материал хуваалцах</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl border border-indigo-100 space-y-3 bg-indigo-50/30">
+                        <h3 class="text-xs font-bold text-indigo-900">👩‍🏫 Бүлгийн багшид илгээх</h3>
+                        <p class="text-xs text-gray-600">Ангид чөлөөт цагаар давтах дуу, хөдөлгөөний заавар илгээх.</p>
+                        <button onclick="alert('✅ Бэлтгэл бүлгийн багшид дууны материал илгээгдлээ!')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl cursor-pointer shadow-sm">Бүлгийн багшид илгээх</button>
+                    </div>
+                    <div class="p-4 rounded-2xl border border-purple-100 space-y-3 bg-purple-50/30">
+                        <h3 class="text-xs font-bold text-purple-900">👨‍👩‍👧 Эцэг эхийн самбарт нийтлэх</h3>
+                        <p class="text-xs text-gray-600">«Алтан намар» дууны үг болон фонограмм аудиог гэртээ давтахад зориулж нийтлэх.</p>
+                        <button onclick="alert('✅ Эцэг эхийн самбарт дууны үг, аудио амжилттай нийтлэгдлээ!')" class="px-4 py-2 bg-purple-600 text-white text-xs font-bold rounded-xl cursor-pointer shadow-sm">Эцэг эхэд хуваалцах</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10. ТАЙЛАН, ТАТАХ, ХЭВЛЭХ -->
+            <div id="tab10" class="tab-content hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-indigo-100 shadow-sm space-y-5">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-indigo-50 pb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-gray-800">📊 Тайлан, татах, хэвлэх (9–5 дугаар сар)</h2>
+                        <p class="text-xs text-gray-500">Сонгосон хугацааны гүйцэтгэлийг нэгтгэж PDF, Word, Excel хэлбэрээр татах.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <select class="text-xs border border-indigo-200 rounded-xl px-3 py-2 bg-indigo-50 font-bold text-indigo-800">
+                            <option>2026 оны 11-р сар</option>
+                            <option>I улирал (9–11 сар)</option>
+                            <option>Бүтэн хичээлийн жил (9–5 сар)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                    <div class="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100">
+                        <div class="text-2xl font-extrabold text-indigo-700">48 / 48</div>
+                        <div class="text-xs text-gray-600 font-bold mt-1">Явуулсан хичээл (100%)</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100">
+                        <div class="text-2xl font-extrabold text-emerald-700">94.5%</div>
+                        <div class="text-xs text-gray-600 font-bold mt-1">Хүүхдийн оролцооны дундаж</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-purple-50/60 border border-purple-100">
+                        <div class="text-2xl font-extrabold text-purple-700">32</div>
+                        <div class="text-xs text-gray-600 font-bold mt-1">Бүртгэсэн ахицын ажиглалт</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <button onclick="alert('📄 PDF тайлан татагдаж байна...')" class="px-4 py-2.5 bg-rose-600 text-white text-xs font-bold rounded-xl cursor-pointer shadow-sm">📕 PDF татах</button>
+                    <button onclick="alert('📝 Word (.docx) тайлан татагдаж байна...')" class="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl cursor-pointer shadow-sm">📘 Word татах</button>
+                    <button onclick="alert('📊 Excel (.xlsx) хүснэгт татагдаж байна...')" class="px-4 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl cursor-pointer shadow-sm">📗 Excel татах</button>
+                    <button onclick="window.print()" class="px-4 py-2.5 bg-gray-800 text-white text-xs font-bold rounded-xl cursor-pointer shadow-sm">🖨️ Шууд хэвлэх (Print)</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- JavaScript Логик -->
+    <script>
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-gray-600 hover:bg-indigo-50 cursor-pointer";
+            });
+            document.querySelectorAll('.mobile-btn').forEach(btn => {
+                btn.className = "mobile-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-gray-600 whitespace-nowrap";
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn_' + tabId).className = "nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition bg-indigo-600 text-white shadow-sm cursor-pointer";
+        }
+
+        function addPlan() {
+            const cat = document.getElementById('planCategory').value;
+            const title = document.getElementById('planTitle').value.trim();
+            const body = document.getElementById('planBody').value.trim();
+            if (!title) { alert('Төлөвлөгөөний сэдвийг оруулна уу!'); return; }
+
+            const list = document.getElementById('planList');
+            const item = document.createElement('div');
+            item.className = "p-3.5 bg-white border border-indigo-100 rounded-2xl space-y-1.5 shadow-2xs";
+            item.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md">${cat}</span>
+                    <span class="text-[10px] text-amber-600 font-bold">⏳ Хянагдаж байна</span>
+                </div>
+                <h4 class="text-xs font-bold text-gray-800">${title}</h4>
+                <p class="text-[11px] text-gray-600">${body}</p>
+            `;
+            list.prepend(item);
+            document.getElementById('planTitle').value = '';
+            document.getElementById('planBody').value = '';
+            alert('✅ Төлөвлөгөө хадгалагдаж Эрхлэгч болон Арга зүйчийн системд илгээгдлээ!');
+        }
+
+        function linkToPlan(songName) {
+            document.getElementById('planTitle').value = songName + " (Дуу, хөгжмийн сангаас холбосон)";
+            openTab('tab3');
+            alert(`🎵 «${songName}» Өдөр тутмын төлөвлөгөөнд шууд холбогдлоо!`);
+        }
+
+        function addObservation() {
+            const child = document.getElementById('obsChild').value;
+            const skill = document.getElementById('obsSkill').value;
+            alert(`✅ ${child} хүүхдийн «${skill}» ахицын бүртгэл хадгалагдаж, эцэг эхийн самбартай холбогдлоо!`);
+        }
+
+        function sendNyrav() {
+            const req = document.getElementById('nyravReq').value.trim();
+            if (!req) { alert('Хүсэлтийн утгыг бичнэ үү!'); return; }
+            alert(`📨 Нярав руу дараах цахим хүсэлт илгээгдлээ:\n«${req}»`);
+            document.getElementById('nyravReq').value = '';
+        }
+    </script>
+</body>
+</html>

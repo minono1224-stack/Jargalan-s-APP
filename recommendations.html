@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Зөвлөмж & Даалгавар</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6b81;
+            --primary-hover: #ff4757;
+            --secondary-color: #2ed573;
+            --bg-gradient: linear-gradient(135deg, #fbc531 0%, #ff6b81 50%, #70a1ff 100%);
+            --card-bg: #ffffff;
+            --text-color: #2f3542;
+            --border-color: #ffdde1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Зүүн талын навигацийн цэс */
+        aside {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px dashed var(--border-color);
+            background: #fff0f3;
+        }
+
+        .sidebar-header h2 {
+            font-size: 16px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .sidebar-menu {
+            padding: 15px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px 14px;
+            margin-bottom: 6px;
+            border: 2px solid transparent;
+            background: #fff9fa;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #57606f;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            text-decoration: none;
+        }
+
+        .menu-btn:hover {
+            background: #ffeaa7;
+            color: #2f3542;
+            border-color: #fdcb6e;
+        }
+
+        .menu-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+
+        /* Баруун талын үндсэн контент */
+        main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 4px solid #fff;
+        }
+
+        h2.title {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #747d8c;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #57606f;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 13px;
+            background-color: #fff9fa;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(255, 107, 129, 0.3);
+        }
+
+        .task-card {
+            background: #fff9fa;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .badge-private {
+            background: #ffeaa7;
+            color: #d35400;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
+            transition: 0.2s;
+        }
+        .btn:hover { background-color: #26af5f; transform: translateY(-1px); }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .role-selector-box {
+            background: #fff0f3;
+            border: 2px dashed var(--primary-color);
+            padding: 12px 20px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ЗҮҮН ТАЛЫН ЦЭС -->
+    <aside>
+        <div>
+            <div class="sidebar-header">
+                <h2>💡 Зөвлөмж & Мэдээлэл</h2>
+                <p style="font-size: 11px; color: #747d8c;">Чандмань-Өндөр СӨБ</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="erhlegch.html" class="menu-btn"><i class="fa-solid fa-crown"></i> Эрхлэгчийн самбар</a>
+                <a href="#" class="menu-btn active"><i class="fa-solid fa-bullhorn"></i> Зөвлөмж & Даалгавар</a>
+                <a href="children.html" class="menu-btn"><i class="fa-solid fa-users"></i> Хүүхдийн жагсаалт</a>
+            </div>
+        </div>
+
+        <div style="padding: 15px; border-top: 2px dashed var(--border-color); text-align: center;">
+            <a href="login.html" style="font-size: 12px; color: #ff4757; font-weight: bold; text-decoration: none;">🚪 Системээс гарах</a>
+        </div>
+    </aside>
+
+    <!-- БАРУУН ТАЛЫН ҮНДСЭН ХЭСЭГ -->
+    <main>
+        <div class="container">
+            <h2 class="title">📢 Зөвлөмж, мэдээлэл солилцох сан</h2>
+            <p class="subtitle">Эрхлэгч, арга зүйч, эмч болон бусад ажилтнууд зөвлөмж оруулах, хэнд харуулахаа сонгох хэсэг.</p>
+
+            <!-- ЭРХ СОЛИХ ХЭСЭГ (Тестийн зорилгоор) -->
+            <div class="role-selector-box">
+                <div>
+                    <span style="font-size: 13px; font-weight: bold; color: #57606f;">👤 Одоогийн үзэж буй эрх:</span>
+                    <b id="roleDisplayLabel" style="color: var(--primary-color);">Бүх мэдээлэл харах</b>
+                </div>
+                <div>
+                    <select id="userRoleSelect" onchange="filterTasks()" style="padding: 6px 10px; font-size: 12px; font-weight: bold;">
+                        <option value="all">Бүх хэрэглэгч (Бүгдийг харна)</option>
+                        <option value="doctor">🩺 Эмч (Эрүүл мэндийн зөвлөмж)</option>
+                        <option value="admin">👑 Эрхлэгч / Арга зүйч</option>
+                        <option value="teacher">👩‍🏫 Бүлгийн багш</option>
+                        <option value="parent">👨‍👩‍👧 Эцэг эх</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ЗӨВЛӨМЖ ОРУУЛАХ ФОРМ (Эмч, Эрхлэгч, Арга зүйч гэх мэт хэн ч оруулах боломжтой) -->
+            <div id="publisherSection" style="background: #fff9fa; padding: 20px; border-radius: 20px; border: 2px solid var(--border-color); margin-bottom: 25px;">
+                <h3 style="font-size: 15px; color: var(--primary-color); margin-bottom: 12px;"><i class="fa-solid fa-file-circle-plus"></i> Шинэ зөвлөмж, мэдээлэл оруулах</h3>
+                
+                <div class="form-group">
+                    <label>Илгээж буй албан тушаал / Нэр</label>
+                    <select id="senderRole">
+                        <option value="🩺 Эмч">🩺 Эмч</option>
+                        <option value="👑 Эрхлэгч">👑 Эрхлэгч</option>
+                        <option value="📚 Арга зүйч">📚 Арга зүйч</option>
+                        <option value="🍲 Хоол зүйч">🍲 Хоол зүйч</option>
+                        <option value="👩‍🏫 Багш">👩‍🏫 Багш</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Гарчиг</label>
+                    <input type="text" id="taskTitle" placeholder="Жишээ нь: Цэцэрлэгийн хүүхдийн ханиад томуунаас урьдчилан сэргийлэх зөвлөмж">
+                </div>
+                
+                <div class="form-group">
+                    <label>Хэнд харуулах вэ? (Үзэгдэх хүрээ)</label>
+                    <select id="taskAudience">
+                        <option value="all">🌐 Бүх хүнд нээлттэй (Багш, Эцэг эх)</option>
+                        <option value="teachers">👩‍🏫 Зөвхөн багш нарт</option>
+                        <option value="parents">👨‍👩‍👧 Зөвхөн эцэг эхчүүдэд</option>
+                        <option value="private">🔒 Зөвхөн өөртөө (Хувийн тэмдэглэл)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Дэлгэрэнгүй заавар, агуулга</label>
+                    <textarea id="taskDesc" rows="3" placeholder="Зөвлөмжийн дэлгэрэнгүй утгыг энд бичнэ үү..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Хавсаргах файл (Word / PDF / Зураг)</label>
+                    <input type="file" id="taskFile" accept=".doc,.docx,.pdf,image/*" style="padding: 7px; background: #fff;">
+                </div>
+
+                <button class="btn btn-primary" onclick="publishTask()">
+                    <i class="fa-solid fa-paper-plane"></i> Нийтлэх & Илгээх
+                </button>
+            </div>
+
+            <!-- ЗӨВЛӨМЖҮҮДИЙН ЖАГСААЛТ -->
+            <h3 style="font-size: 16px; color: #2f3542; margin-bottom: 12px;"><i class="fa-solid fa-clipboard-list"></i> Зөвлөмжүүдийн жагсаалт</h3>
+            <div id="tasksContainer">
+                <div class="task-card" data-audience="all" data-sender="🩺 Эмч">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--primary-color); font-weight: bold; margin-bottom: 4px;">
+                        <span>🩺 Илгээгч: Эмч <span class="badge-private">🌐 Бүх хүнд</span></span>
+                        <span>2026-11-17 14:00</span>
+                    </div>
+                    <div style="font-weight: bold; font-size: 15px; color: #2f3542; margin-bottom: 5px;">Өвлийн улиралд анхаарах эрүүл мэндийн зөвлөмж</div>
+                    <p style="font-size: 13px; color: #57606f; margin-bottom: 8px;">Хүүхдийг даархаас сэргийлж дулаан хувцаслаж, амин дэмтэй хоол хүнс түлхүү өгөх.</p>
+                    <div>
+                        <a href="#" style="color: #0984e3; font-weight: bold; font-size: 12px;"><i class="fa-solid fa-file-pdf"></i> Eмчийн_зөвлөмж.pdf</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function publishTask() {
+            const sender = document.getElementById('senderRole').value;
+            const title = document.getElementById('taskTitle').value.trim();
+            const desc = document.getElementById('taskDesc').value.trim();
+            const audience = document.getElementById('taskAudience').value;
+            const fileInput = document.getElementById('taskFile');
+
+            if(!title || !desc) {
+                alert("Гарчиг болон агуулгыг заавал бөглөнө үү!");
+                return;
+            }
+
+            const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "";
+            
+            // Автоматаар огноо цаг үүсгэх
+            const now = new Date();
+            const dateTimeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            let audienceText = "🌐 Бүх хүнд";
+            if(audience === 'teachers') audienceText = "👩‍🏫 Зөвхөн багш нарт";
+            if(audience === 'parents') audienceText = "👨‍👩‍👧 Зөвхөн эцэг эхчүүдэд";
+            if(audience === 'private') audienceText = "🔒 Зөвхөн өөртөө";
+
+            const container = document.getElementById('tasksContainer');
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.setAttribute('data-audience', audience);
+            card.setAttribute('data-sender', sender);
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--primary-color); font-weight: bold; margin-bottom: 4px;">
+                    <span>${sender} <span class="badge-private">${audienceText}</span></span>
+                    <span>${dateTimeStr}</span>
+                </div>
+                <div style="font-weight: bold; font-size: 15px; color: #2f3542; margin-bottom: 5px;">${title}</div>
+                <p style="font-size: 13px; color: #57606f; margin-bottom: 8px;">${desc}</p>
+                ${fileName ? `<div><a href="#" style="color: #0984e3; font-weight: bold; font-size: 12px;"><i class="fa-solid fa-file-lines" style="color: #00b894;"></i> ${fileName}</a></div>` : ''}
+            `;
+            container.prepend(card);
+
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDesc').value = '';
+            fileInput.value = '';
+            alert("✨ Зөвлөмж амжилттай нийтлэгдлээ!");
+            filterTasks();
+        }
+
+        function filterTasks() {
+            const role = document.getElementById('userRoleSelect').value;
+            const displayLabel = document.getElementById('roleDisplayLabel');
+            const cards = document.querySelectorAll('.task-card');
+
+            displayLabel.innerText = role === 'all' ? "Бүх хэрэглэгч (Бүгдийг харна)" : 
+                                     role === 'doctor' ? "🩺 Эмч" : 
+                                     role === 'admin' ? "👑 Эрхлэгч / Арга зүйч" : 
+                                     role === 'teacher' ? "👩‍🏫 Бүлгийн багш" : "👨‍👩‍👧 Эцэг эх";
+
+            cards.forEach(card => {
+                const aud = card.getAttribute('data-audience');
+                if(aud === 'private' && role !== 'admin' && role !== 'doctor') {
+                    card.style.display = 'none'; // Хувийн тэмдэглэлийг бусад нь харахгүй
+                } else if(role === 'all' || role === 'admin') {
+                    card.style.display = 'block';
+                } else if(role === 'teacher' && (aud === 'all' || aud === 'teachers')) {
+                    card.style.display = 'block';
+                } else if(role === 'parent' && (aud === 'all' || aud === 'parents')) {
+                    card.style.display = 'block';
+                } else if(role === 'doctor' && (aud === 'all' || aud === 'private')) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

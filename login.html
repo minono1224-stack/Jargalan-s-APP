@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Нэвтрэх болон Бүртгэл</title>
+    <!-- Tailwind CSS болон FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+        body { font-family: 'Fredoka', sans-serif; }
+        .form-section { display: none; }
+        .form-section.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-amber-200 via-rose-300 to-indigo-400 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-lg bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-4 border-white p-8 relative overflow-hidden">
+        
+        <!-- Чимэглэлийн цагираг -->
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-rose-200 rounded-full blur-2xl opacity-60 pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-amber-200 rounded-full blur-2xl opacity-60 pointer-events-none"></div>
+
+        <!-- 1. НЭВТРЭХ ХЭСЭГ -->
+        <div id="loginView" class="form-section active space-y-5">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 mx-auto bg-gradient-to-tr from-rose-500 to-amber-400 rounded-2xl flex items-center justify-center text-3xl text-white shadow-lg shadow-rose-200">
+                    🧸
+                </div>
+                <h2 class="text-2xl font-black text-gray-800">Чандмань-Өндөр СӨБ</h2>
+                <p class="text-xs text-gray-500 font-medium">Албан ёсны цахим системд нэвтрэх</p>
+            </div>
+            
+            <form onsubmit="handleCustomLogin(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1.5"><i class="fa-solid fa-user-shield text-rose-500 mr-1"></i> Нэвтрэх эрх сонгох</label>
+                    <select id="loginRole" class="w-full p-3.5 border-2 border-rose-100 rounded-2xl bg-rose-50/30 font-bold text-gray-700 outline-none focus:border-rose-400 transition">
+                        <option value="erhlegch.html">👑 Эрхлэгч</option>
+                        <option value="argazuich.html">👩‍🏫 Арга зүйч</option>
+                        <option value="teacher.html">🖍️ Багш</option>
+                        <option value="music-teacher.html">🎵 Дуу хөгжмийн багш</option>
+                        <option value="sport-teacher.html">⚽ Биеийн тамирын багш</option>
+                        <option value="jijuur.html">🛡️ Жижүүр (Цагийн бүртгэл)</option>
+                        <option value="index.html">🧸 Бусад хэрэглэгч / Ерөнхий самбар</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1.5"><i class="fa-solid fa-phone text-rose-500 mr-1"></i> Утасны дугаар эсвэл Gmail хаяг</label>
+                    <input type="text" id="loginUser" placeholder="Жишээ: 99112233 эсвэл admin@gmail.com" required class="w-full p-3.5 border-2 border-rose-100 rounded-2xl bg-rose-50/30 outline-none focus:border-rose-400 transition font-medium">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1.5"><i class="fa-solid fa-lock text-rose-500 mr-1"></i> Нууц үг</label>
+                    <input type="password" id="loginPass" placeholder="••••••••" required class="w-full p-3.5 border-2 border-rose-100 rounded-2xl bg-rose-50/30 outline-none focus:border-rose-400 transition font-medium">
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-rose-300 transition transform active:scale-98 text-sm">
+                    🚀 Системд нэвтрэх
+                </button>
+            </form>
+
+            <div class="text-center pt-2 text-xs">
+                <p class="text-gray-500 font-medium">Цэцэрлэгээ бүртгүүлэхээ амжаагүй байна уу? <a onclick="switchView('registerView')" class="text-rose-500 font-bold hover:underline cursor-pointer">Энд дарж бүртгүүлэх</a></p>
+            </div>
+        </div>
+
+        <!-- 2. ЦЭЦЭРЛЭГ БҮРТГҮҮЛЭХ ХЭСЭГ -->
+        <div id="registerView" class="form-section space-y-4">
+            <div class="text-center space-y-1">
+                <div class="w-14 h-14 mx-auto bg-gradient-to-tr from-sky-400 to-indigo-500 rounded-2xl flex items-center justify-center text-2xl text-white shadow-lg shadow-sky-200">
+                    🏫
+                </div>
+                <h2 class="text-xl font-black text-gray-800">Цэцэрлэг Бүртгүүлэх</h2>
+                <p class="text-xs text-gray-500">Шинэ цэцэрлэгийн эрх үүсгэх хэсэг</p>
+            </div>
+            
+            <form onsubmit="handleRegister(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">🏛️ Цэцэрлэгийн албан ёсны нэр</label>
+                    <input type="text" placeholder="Жишээ: Чандмань-Өндөр СӨБ" required class="w-full p-3 border-2 border-sky-100 rounded-2xl bg-sky-50/30 outline-none focus:border-sky-400 font-medium">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">🔢 Байгууллагын бүртгэлийн дугаар</label>
+                    <input type="text" placeholder="Улсын бүртгэлийн дугаар" required class="w-full p-3 border-2 border-sky-100 rounded-2xl bg-sky-50/30 outline-none focus:border-sky-400 font-medium">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">👤 Эрхлэгчийн овог нэр</label>
+                    <input type="text" placeholder="Таны бүтэн нэр" required class="w-full p-3 border-2 border-sky-100 rounded-2xl bg-sky-50/30 outline-none focus:border-sky-400 font-medium">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">📞 Утасны дугаар</label>
+                        <input type="text" placeholder="99112233" required class="w-full p-3 border-2 border-sky-100 rounded-2xl bg-sky-50/30 outline-none focus:border-sky-400 font-medium">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">✉️ Gmail хаяг</label>
+                        <input type="email" placeholder="example@gmail.com" required class="w-full p-3 border-2 border-sky-100 rounded-2xl bg-sky-50/30 outline-none focus:border-sky-400 font-medium">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-black py-3.5 rounded-2xl shadow-lg shadow-sky-200 transition transform active:scale-98 text-sm mt-2">
+                    ✨ Бүртгүүлж, код авах
+                </button>
+            </form>
+
+            <div class="text-center pt-2 text-xs">
+                <p class="text-gray-500 font-medium">Бүртгэлтэй бол <a onclick="switchView('loginView')" class="text-sky-500 font-bold hover:underline cursor-pointer">Буцаад нэвтрэх</a></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript логик -->
+    <script>
+        function switchView(viewId) {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        function handleCustomLogin(event) {
+            event.preventDefault();
+            const targetPage = document.getElementById('loginRole').value;
+            const user = document.getElementById('loginUser').value;
+            
+            if(user) {
+                alert("🎉 Амжилттай нэвтэрлээ! Тухайн самбар руу шилжиж байна.");
+                window.location.href = targetPage; // Сонгосон эрхийн дагуу тухайн файл руу шууд үсрэнэ
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            alert("✨ Цэцэрлэгийн бүртгэл амжилттай үүслээ! Таны утас болон Gmail рүү баталгаажуулах код илгээгдлээ.");
+            switchView('loginView');
+        }
+    </script>
+</body>
+</html>

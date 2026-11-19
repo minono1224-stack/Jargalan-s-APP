@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Цахим Систем</title>
+    <style>
+        :root {
+            --primary-color: #ff6b81;
+            --primary-hover: #ff4757;
+            --secondary-color: #2ed573;
+            --bg-color: #fff1f2;
+            --card-bg: #ffffff;
+            --text-color: #2f3542;
+            --border-color: #ffdde1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fbc531 0%, #ff6b81 50%, #70a1ff 100%);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 4px solid #fff;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #747d8c;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+
+        .login-box, .dashboard {
+            display: none;
+        }
+
+        .login-box.active, .dashboard.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #57606f;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px;
+            background-color: #fff9fa;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(255, 107, 129, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4);
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            background: #fff0f3;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px dashed var(--primary-color);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .menu-card {
+            background: #f1f2f6;
+            border: 2px solid #dfe4ea;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #2f3542;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .menu-card:hover {
+            border-color: var(--primary-color);
+            background: #ff4757;
+            color: white;
+            transform: scale(1.03);
+            box-shadow: 0 6px 15px rgba(255, 71, 87, 0.3);
+        }
+
+        .logout-btn {
+            background-color: #ffa502;
+            width: auto;
+            padding: 8px 16px;
+            margin-top: 0;
+            font-size: 14px;
+            box-shadow: none;
+        }
+        .logout-btn:hover {
+            background-color: #ff7f50;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- НЭВТРЭХ ХЭСЭГ -->
+        <div id="loginSection" class="login-box active">
+            <h2>🧸 Чандмань-Өндөр СӨБ 🎨</h2>
+            <p class="subtitle">Цэцэрлэгийн нэгдсэн цахим системд тавтай морилно уу!</p>
+            
+            <div class="form-group">
+                <label for="roleSelect">🌟 Та өөрийн эрхээ сонгоно уу:</label>
+                <select id="roleSelect">
+                    <optgroup label="👑 Удирдлага">
+                        <option value="director">👩‍💼 Эрхлэгч</option>
+                        <option value="methodist">👩‍🏫 Арга зүйч</option>
+                    </optgroup>
+                    <optgroup label="🍎 Багш нар">
+                        <option value="teacher">🖍️ Бүлгийн багш</option>
+                        <option value="assistant">🧸 Багшийн туслах</option>
+                        <option value="music">🎵 Дуу хөгжмийн багш</option>
+                        <option value="sport">⚽ Биеийн тамирын багш</option>
+                    </optgroup>
+                    <optgroup label="🏡 Ажилтнууд">
+                        <option value="doctor">🩺 Эмч</option>
+                        <option value="cook">🍲 Тогооч</option>
+                        <option value="storekeeper">📦 Нярав</option>
+                        <option value="accountant">📊 Нягтлан</option>
+                        <option value="guard">🛡️ Жижүүр</option>
+                    </optgroup>
+                    <optgroup label="👨‍👩‍👧 Эцэг эх">
+                        <option value="parent">❤️ Эцэг эх / Асран хамгаалагч</option>
+                    </optgroup>
+                </select>
+            </div>
+            <button onclick="handleLogin()">🚀 Системд Нэвтрэх</button>
+        </div>
+
+        <!-- АЖЛЫН САМБАР -->
+        <div id="dashboardSection" class="dashboard">
+            <div class="user-info">
+                <div>
+                    <h3 id="welcomeText" style="color: var(--primary-color);">Тавтай морилно уу</h3>
+                    <p id="roleDescText" style="font-size: 14px; color: #57606f; margin-top: 4px;"></p>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">🚪 Гарах</button>
+            </div>
+
+            <hr style="border: 0; border-top: 2px dashed #ffdde1; margin-bottom: 20px;">
+
+            <h4 style="color: #2f3542;">✨ Таны ажиллах хэсгүүд:</h4>
+            <div id="menuContainer" class="menu-grid">
+                <!-- Динамикаар цэсүүд байрлана -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const roleMenus = {
+            director: {
+                name: "Эрхлэгч",
+                desc: "Байгууллагын нэгдсэн хяналт, тайлан болон албан хаагчдын удирдлага",
+                menus: ["📊 Хяналтын самбар", "📚 Сургалтын хөтөлбөр", "🧸 Бүлэг ба Хүүхдүүд", "👥 Албан хаагчид", "🛡️ Цэцэрлэгийн хяналт", "🍲 Хоол үйлдвэрлэл", "🩺 Эмч зөвлөж байна", "⚙️ Тохиргоо"]
+            },
+            methodist: {
+                name: "Арга зүйч",
+                desc: "Сургалтын арга зүй, багш нарын төлөвлөгөө болон хичээлийн хяналт",
+                menus: ["📊 Хяналтын самбар", "📚 Сургалтын хөтөлбөр", "🧸 Бүлэг ба Хүүхдүүд", "👥 Албан хаагчид", "🎯 Көүч арга зүйч", "🛡️ Цэцэрлэгийн хяналт", "📈 Тайлан"]
+            },
+            teacher: {
+                name: "Бүлгийн багш",
+                desc: "Өөрийн хариуцсан бүлгийн хүүхэд, ирц, ажиглалт болон үнэлгээ",
+                menus: ["📊 Хяналтын самбар", "📚 Сургалтын хөтөлбөр", "🧸 Бүлгийн хүүхдүүд", "🧩 Суралцахуйн үр дүн", "📅 Ирц", "💻 Цахим сан", "💬 Бүлгийн чат"]
+            },
+            assistant: {
+                name: "Багшийн туслах",
+                desc: "Өдөр тутмын асаргаа, ирц болон ариутгалын бүртгэл",
+                menus: ["📊 Хяналтын самбар", "📅 Ирц", "✨ Ариутгал", "🧸 Дадал хэвшил", "💬 Бүлгийн чат"]
+            },
+            music: {
+                name: "Дуу хөгжмийн багш",
+                desc: "Хөгжмийн хичээлийн хуваарь, төлөвлөгөө болон сан",
+                menus: ["📊 Хяналтын самбар", "📅 Хичээлийн хуваарь", "📚 Сургалтын төлөвлөгөө", "🎵 Дуу, хөгжмийн сан", "⭐ Ажиглалт, ахиц"]
+            },
+            sport: {
+                name: "Биеийн тамирын багш",
+                desc: "Биеийн тамирын хичээл, сорил болон хөдөлгөөний хөгжил",
+                menus: ["📊 Хяналтын самбар", "📅 Хичээлийн хуваарь", "📚 Сургалтын төлөвлөгөө", "🏃 Сорил бүртгэл", "⭐ Хүүхдийн ахиц"]
+            },
+            doctor: {
+                name: "Эмч",
+                desc: "Эрүүл мэндийн хяналт, өвчлөл, харшил болон ариутгал",
+                menus: ["🩺 Эрүүл мэндийн самбар", "📈 Өсөлт хөгжил", "⚠️ Өвчлөлийн бүртгэл", "🛑 Харшлын мэдээлэл", "🍼 Дээжийн бүртгэл", "✨ Ариутгал"]
+            },
+            cook: {
+                name: "Тогооч",
+                desc: "Хоол үйлдвэрлэл, 7 хоногийн болон өдрийн цэс",
+                menus: ["🍲 Хоолны үндсэн цэс", "📅 7 хоногийн төлөвлөгөө", "🍳 Өдрийн хоол", "🛒 Хүнс захиалах", "🍼 Дээж авалт", "🛑 Харшлын мэдээлэл"]
+            },
+            storekeeper: {
+                name: "Нярав",
+                desc: "Агуулахын орлого, зарлага болон материал олголт",
+                menus: ["📦 Нүүр самбар", "📋 Бараа бүртгэл", "📥 Орлого", "📤 Хүнсний зарлага", "📝 Материалын хүсэлт", "📊 Үлдэгдэл хяналт", "🔍 Тооллого"]
+            },
+            accountant: {
+                name: "Нягтлан",
+                desc: "Санхүүгийн баримт, орлого зарлагын хяналт",
+                menus: ["📊 Санхүүгийн хяналт", "🔄 Орлого зарлагын тулгалт", "📈 Тайлан татах"]
+            },
+            guard: {
+                name: "Жижүүр",
+                desc: "Албан хаагчдын цагийн бүртгэл болон байгууллагын аюулгүй байдал",
+                menus: ["👥 Албан хаагчид", "⏰ Цагийн бүртгэл", "📈 Тайлан илгээх"]
+            },
+            parent: {
+                name: "Эцэг эх / Асран хамгаалагч",
+                desc: "Зөвхөн өөрийн хүүхдийн мэдээлэл, ирц болон хоолны цэс",
+                menus: ["👶 Миний хүүхэд", "📂 Хувийн хавтас", "💌 Зөвлөмж / Зөвхөн танд", "🍲 Хоолны цэс", "💬 Бүлгийн чат", "📝 Даалгаврын сан"]
+            }
+        };
+
+        function handleLogin() {
+            const selectElement = document.getElementById("roleSelect");
+            const selectedRole = selectElement.value;
+            const roleData = roleMenus[selectedRole];
+
+            if (!roleData) return;
+
+            document.getElementById("welcomeText").innerText = `✨ Самбар: ${roleData.name}`;
+            document.getElementById("roleDescText").innerText = roleData.desc;
+
+            const menuContainer = document.getElementById("menuContainer");
+            menuContainer.innerHTML = "";
+
+            roleData.menus.forEach(menuName => {
+                const card = document.createElement("div");
+                card.className = "menu-card";
+                card.innerText = menuName;
+                card.onclick = () => alert(`🌟 "${menuName}" модульд амжилттай нэвтэрлээ! (${roleData.name})`);
+                menuContainer.appendChild(card);
+            });
+
+            document.getElementById("loginSection").classList.remove("active");
+            document.getElementById("dashboardSection").classList.add("active");
+        }
+
+        function handleLogout() {
+            document.getElementById("dashboardSection").classList.remove("active");
+            document.getElementById("loginSection").classList.add("active");
+        }
+    </script>
+</body>
+</html>

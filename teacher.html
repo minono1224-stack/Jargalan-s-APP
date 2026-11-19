@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Бүлгийн багшийн самбар</title>
+    <!-- FontAwesome болон Tailwind CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; }
+        .sidebar-scroll::-webkit-scrollbar { width: 5px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- ЗҮҮН ТАЛЫН НАВИГАЦИЙН 17 ЦЭС -->
+    <aside class="w-72 bg-white border-r border-gray-200 flex flex-col justify-between shadow-sm z-20">
+        <div>
+            <!-- Лого болон гарчиг -->
+            <div class="p-4 flex items-center gap-3 border-b border-gray-100 bg-orange-50/50">
+                <div class="w-10 h-10 rounded-2xl bg-orange-400 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-orange-200">
+                    🖍️
+                </div>
+                <div>
+                    <h1 class="font-bold text-gray-800 text-xs">Бүлгийн багшийн самбар</h1>
+                    <p class="text-[11px] text-orange-500 font-semibold" id="asideGroupName">Пороро бүлэг</p>
+                </div>
+            </div>
+
+            <!-- Цэсүүд -->
+            <nav class="px-3 py-2 space-y-1 text-xs font-medium text-gray-600 overflow-y-auto sidebar-scroll" style="max-height: calc(100vh - 140px);">
+                <button onclick="switchSection('sec-1', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 bg-orange-50 text-orange-600 rounded-xl font-bold transition"><i class="fa-solid fa-chart-line w-4"></i> 1. Хяналтын самбар</button>
+                <button onclick="switchSection('sec-2', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-book-open w-4 text-blue-500"></i> 2. Сургалтын хөтөлбөр</button>
+                <button onclick="switchSection('sec-3', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-children w-4 text-pink-500"></i> 3. Бүлгийн хүүхдүүд & Профайл</button>
+                <button onclick="switchSection('sec-4', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-graduation-cap w-4 text-purple-500"></i> 4. Сургуульд бэлтгэгдсэн байдал</button>
+                <button onclick="switchSection('sec-5', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-triangle-exclamation w-4 text-red-500"></i> 5. Эрсдэлт бүлгийн хүүхэд</button>
+                <button onclick="switchSection('sec-6', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-puzzle-piece w-4 text-amber-500"></i> 6. ХБХ-тэй хүүхэд</button>
+                <button onclick="switchSection('sec-7', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-envelope-open-text w-4 text-emerald-500"></i> 7. Зөвлөмж</button>
+                <button onclick="switchSection('sec-8', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-utensils w-4 text-rose-500"></i> 8. Хоол үйлдвэрлэл</button>
+                <button onclick="switchSection('sec-9', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-stethoscope w-4 text-teal-500"></i> 9. Эмч зөвлөж байна</button>
+                <button onclick="switchSection('sec-10', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-file-lines w-4 text-indigo-500"></i> 10. Тайлан (9–5 сар)</button>
+                <button onclick="switchSection('sec-11', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-folder-open w-4 text-yellow-500"></i> 11. Цахим сан</button>
+                <button onclick="switchSection('sec-12', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-list-check w-4 text-cyan-500"></i> 12. Даалгаврын сан</button>
+                <button onclick="switchSection('sec-13', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-comments w-4 text-sky-500"></i> 13. Бүлгийн чат</button>
+                <button onclick="switchSection('sec-14', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-chalkboard-user w-4 text-violet-500"></i> 14. Багшийн арга зүй</button>
+                <button onclick="switchSection('sec-15', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-calendar-days w-4 text-emerald-600"></i> 15. Ирц</button>
+                <button onclick="switchSection('sec-16', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-shield-halved w-4 text-rose-600"></i> 16. Цэцэрлэгийн хяналт</button>
+                <button onclick="switchSection('sec-17', this)" class="menu-btn w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded-xl transition"><i class="fa-solid fa-gears w-4 text-gray-500"></i> 17. Хувийн тохиргоо</button>
+            </nav>
+        </div>
+
+        <div class="p-3 border-t border-gray-100 bg-white">
+            <a href="login.html" class="w-full bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition">
+                <i class="fa-solid fa-right-from-bracket"></i> Системээс гарах
+            </a>
+        </div>
+    </aside>
+
+    <!-- БАРУУН ТАЛЫН ҮНДСЭН АЖИЛЛАХ ХЭСЭГ -->
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-5xl mx-auto space-y-6">
+
+            <!-- 1. ХЯНАЛТЫН САМБАР -->
+            <div id="sec-1" class="section-pane space-y-6">
+                <div class="bg-gradient-to-r from-orange-400 to-amber-400 rounded-3xl p-6 text-white shadow-md flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold">Тавтай морилно уу, <span id="welcomeTeacherName">Багш аа</span>! 🧸</h2>
+                        <p class="text-orange-100 text-xs mt-1"><span id="welcomeGroupName">Пороро бүлэг</span> • Идэвхтэй самбар</p>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl text-xs font-semibold">
+                        📅 2026 оны 11 сар
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs text-gray-400 font-semibold">Нийт хүүхэд</p>
+                        <h3 class="text-2xl font-black text-gray-800 mt-1" id="dashTotalCount">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs text-gray-400 font-semibold">Өнөөдөр ирсэн</p>
+                        <h3 class="text-2xl font-black text-emerald-500 mt-1" id="dashPresentCount">0</h3>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs text-gray-400 font-semibold">Өвчтэй / Чөлөөтэй</p>
+                        <h3 class="text-2xl font-black text-amber-500 mt-1" id="dashAbsentCount">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. СУРГАЛТЫН ХӨТӨЛБӨР -->
+            <div id="sec-2" class="section-pane hidden space-y-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-800">📚 Сургалтын хөтөлбөр ба төлөвлөгөө</h2>
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <select class="w-full border rounded-xl p-2.5 bg-gray-50 font-bold">
+                        <option>Долоо хоногийн төлөвлөгөө</option>
+                        <option>Өдрийн үйл ажиллагааны төлөвлөгөө</option>
+                    </select>
+                    <div>
+                        <label class="block font-bold text-gray-600 mb-1">Файл хавсаргах</label>
+                        <input type="file" class="w-full border rounded-xl p-2 text-xs bg-gray-50">
+                    </div>
+                </div>
+                <textarea rows="4" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="Төлөвлөгөөний дэлгэрэнгүй агуулга..."></textarea>
+                <div class="flex gap-2">
+                    <button onclick="alert('✨ Амжилттай хадгалагдлаа!')" class="bg-orange-400 hover:bg-orange-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow">Хадгалах</button>
+                    <button onclick="alert('📥 Төлөвлөгөө татаж байна...')" class="bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow">Татах / Хэвлэх</button>
+                </div>
+            </div>
+
+            <!-- 3. БҮЛГИЙН ХҮҮХДҮҮД & ПРОФАЙЛ -->
+            <div id="sec-3" class="section-pane hidden space-y-6 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center border-b pb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800">🧸 Хүүхдийн профайл & Медиа сан</h2>
+                        <p class="text-xs text-gray-500">Хүүхдийн зураг, аватар, видео бичлэг болон дуу хоолой оруулах хэсэг.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select id="activeGroupSelect" onchange="changeActiveGroup()" class="border-2 border-orange-200 rounded-xl p-2 text-xs font-bold text-orange-600 bg-orange-50 outline-none">
+                            <option value="Пороро бүлэг">Пороро бүлэг</option>
+                        </select>
+                        <button onclick="createNewGroup()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition">+ Бүлэг нэмэх</button>
+                    </div>
+                </div>
+
+                <div class="bg-orange-50/40 p-4 rounded-2xl border border-orange-100 space-y-3">
+                    <h3 class="text-xs font-bold text-gray-800"><i class="fa-solid fa-user-plus text-orange-500 mr-1"></i> Шинэ хүүхэд бүртгэх</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
+                        <input type="text" id="newStudentName" placeholder="Овог, нэр..." class="border rounded-xl p-2.5 bg-white outline-none">
+                        <input type="number" id="newStudentAge" placeholder="Нас" class="border rounded-xl p-2.5 bg-white outline-none">
+                        <input type="text" id="newStudentParent" placeholder="Эцэг/эх (Утас)..." class="border rounded-xl p-2.5 bg-white outline-none">
+                        <select id="newStudentAttendance" class="border rounded-xl p-2.5 bg-white outline-none font-bold text-emerald-600">
+                            <option value="Ирсэн">Ирсэн</option>
+                            <option value="Өвчтэй">Өвчтэй</option>
+                            <option value="Чөлөөтэй">Чөлөөтэй</option>
+                        </select>
+                    </div>
+                    <button onclick="addStudentToGroup()" class="bg-orange-400 hover:bg-orange-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition">💾 Бүртгэх</button>
+                </div>
+
+                <div id="studentCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+
+            <!-- 4. СУРГУУЛЬД БЭЛТГЭГДСЭН БАЙДАЛ -->
+            <div id="sec-4" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">🎓 Сургуульд бэлтгэгдсэн байдал</h2>
+                <textarea rows="4" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="Бэлтгэгдсэн байдлын тайлан бичих..."></textarea>
+                <div class="flex items-center gap-4 text-xs">
+                    <div><label class="font-bold text-gray-600 block mb-1">Файл хавсаргах</label><input type="file" class="border rounded-xl p-2 bg-gray-50 text-[11px]"></div>
+                    <button onclick="alert('✨ Амжилттай хадгалагдлаа!')" class="bg-purple-600 text-white font-bold px-5 py-2.5 rounded-xl mt-4 shadow">Хадгалах</button>
+                    <button onclick="alert('📥 Тайлан татаж байна...')" class="bg-sky-500 text-white font-bold px-5 py-2.5 rounded-xl mt-4 shadow">Татаж авах</button>
+                </div>
+            </div>
+
+            <!-- 5. ЭРСДЭЛТ БҮЛГИЙН ХҮҮХЭД -->
+            <div id="sec-5" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">⚠️ Эрсдэлт бүлгийн хүүхэд</h2>
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <input type="text" placeholder="Хүүхдийн нэр..." class="border rounded-xl p-2.5 bg-gray-50">
+                    <select class="border rounded-xl p-2.5 bg-gray-50 font-bold text-red-500">
+                        <option>Эрсдэлийн төрөл: Ар гэрийн анхаарах</option>
+                        <option>Эрсдэлийн төрөл: Эрүүл мэндийн</option>
+                    </select>
+                </div>
+                <textarea rows="3" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="Дэлгэрэнгүй нөхцөл байдал..."></textarea>
+                <div class="flex gap-2 text-xs">
+                    <input type="file" class="border rounded-xl p-2 bg-gray-50">
+                    <button onclick="alert('✨ Эрсдэлийн бүртгэл хадгалагдлаа!')" class="bg-red-500 text-white font-bold px-4 py-2 rounded-xl shadow">Хадгалах & Татах</button>
+                </div>
+            </div>
+
+            <!-- 6. ХБХ-ТЭЙ ХҮҮХЭД -->
+            <div id="sec-6" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">🧩 ХБХ-тэй хүүхэд (Тусгай хэрэгцээт)</h2>
+                <input type="text" placeholder="Хүүхдийн нэр ба дэмжлэг шаардлагатай чиглэл..." class="w-full border rounded-xl p-2.5 text-xs bg-gray-50">
+                <textarea rows="3" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="Хөгжлийн хөтөлбөр болон ажиглалтын тэмдэглэл..."></textarea>
+                <div class="flex items-center gap-4 text-xs">
+                    <div><label class="font-bold text-gray-600 mb-1 block">🎤 Дуу хоолой</label><input type="file" accept="audio/*" class="border rounded-xl p-2 bg-gray-50"></div>
+                    <div><label class="font-bold text-gray-600 mb-1 block">📄 Файл</label><input type="file" class="border rounded-xl p-2 bg-gray-50"></div>
+                    <button onclick="alert('✨ Хадгалагдлаа!')" class="bg-amber-500 text-white font-bold px-5 py-2.5 rounded-xl mt-4 shadow">Хадгалах</button>
+                </div>
+            </div>
+
+            <!-- 7. ЗӨВЛӨМЖ -->
+            <div id="sec-7" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">💌 Зөвлөмж илгээх & Хүлээн авах</h2>
+                <select class="w-full border rounded-xl p-2.5 text-xs bg-gray-50 font-bold">
+                    <option>Хүлээн авагч: Бүх эцэг эхчүүд рүү</option>
+                    <option>Хүлээн авагч: Туслах багш руу</option>
+                </select>
+                <textarea rows="3" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="Зөвлөмжийн агуулга..."></textarea>
+                <div class="flex gap-2 text-xs">
+                    <input type="file" class="border rounded-xl p-2 bg-gray-50">
+                    <button onclick="alert('📤 Илгээгдлээ!')" class="bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl shadow">Илгээх & Татах</button>
+                </div>
+            </div>
+
+            <!-- 8. ХООЛ ҮЙЛДВЭРЛЭЛ -->
+            <div id="sec-8" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">🍲 Хоол үйлдвэрлэл & Цэс хяналт</h2>
+                <textarea rows="3" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="Хоолны цэсний төлөвлөгөө..."></textarea>
+                <div class="flex gap-2 text-xs">
+                    <input type="file" class="border rounded-xl p-2 bg-gray-50">
+                    <button onclick="alert('✨ Хадгалагдлаа!')" class="bg-rose-500 text-white font-bold px-4 py-2 rounded-xl shadow">Хадгалах</button>
+                </div>
+            </div>
+
+            <!-- 9. ЭМЧ ЗӨВЛӨЖ БАЙНА -->
+            <div id="sec-9" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">🩺 Эмч зөвлөж байна</h2>
+                <div class="bg-teal-50 border border-teal-200 p-4 rounded-2xl text-xs space-y-2">
+                    <p class="font-bold text-teal-800">🏥 Эмчийн ирүүлсэн мэдэгдэл:</p>
+                    <p class="text-gray-600">"Өвлийн улирал эхэлж байгаатай холбогдуулан ангийн агааржуулалтад анхаарна уу."</p>
+                </div>
+                <input type="file" class="border rounded-xl p-2 bg-gray-50 text-xs">
+                <button onclick="alert('📥 Татаж байна...')" class="bg-teal-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow">Татаж авах</button>
+            </div>
+
+            <!-- 10. ТАЙЛАН (9–5 САР) -->
+            <div id="sec-10" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">📈 Тайлан (9–5 сар) боловсруулах</h2>
+                <select class="w-full border rounded-xl p-2.5 text-xs bg-gray-50 font-bold">
+                    <option>Явцын тайлан</option>
+                    <option>Жилийн эцсийн тайлан (5 сар)</option>
+                </select>
+                <textarea rows="4" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="Тайлангийн агуулга..."></textarea>
+                <div class="flex gap-2 text-xs">
+                    <input type="file" class="border rounded-xl p-2 bg-gray-50">
+                    <button onclick="alert('✨ Хадгалагдлаа!')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl shadow">Хадгалах</button>
+                    <button onclick="alert('📥 Татаж байна...')" class="bg-sky-500 text-white font-bold px-4 py-2 rounded-xl shadow">Татаж авах</button>
+                </div>
+            </div>
+
+            <!-- 11. ЦАХИМ САН -->
+            <div id="sec-11" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">🗂️ Цахим сан (Видео, Дуу, Материал)</h2>
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <input type="text" placeholder="Файлын нэр..." class="border rounded-xl p-2.5 bg-gray-50">
+                    <input type="file" class="border rounded-xl p-2 bg-gray-50">
+                </div>
+                <button onclick="alert('✨ Байршууллаа!')" class="bg-yellow-500 text-white font-bold px-4 py-2 rounded-xl text-xs shadow">Файл байршуулах</button>
+            </div>
+
+            <!-- 12. ДААЛГАВРЫН САН -->
+            <div id="sec-12" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">📋 Даалгаврын сан</h2>
+                <input type="text" placeholder="Даалгаврын гарчиг..." class="w-full border rounded-xl p-2.5 text-xs bg-gray-50">
+                <textarea rows="3" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="Даалгаврын заавар..."></textarea>
+                <div class="flex gap-2 text-xs">
+                    <input type="file" class="border rounded-xl p-2 bg-gray-50">
+                    <button onclick="alert('✨ Хадгалагдлаа!')" class="bg-cyan-600 text-white font-bold px-4 py-2 rounded-xl shadow">Хадгалах & Татах</button>
+                </div>
+            </div>
+
+            <!-- 13. БҮЛГИЙН ЧАТ -->
+            <div id="sec-13" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">💬 Бүлгийн чат</h2>
+                <div class="border rounded-2xl p-4 h-64 bg-gray-50 flex flex-col justify-between">
+                    <div class="text-xs text-gray-500 overflow-y-auto space-y-2">
+                        <p class="bg-white p-2 rounded-xl shadow-sm"><b>Батбаяр (Эцэг эх):</b> Сайн байна уу багш аа?</p>
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <input type="text" placeholder="Мессеж бичих..." class="border rounded-xl p-2 text-xs flex-1 outline-none bg-white">
+                        <button onclick="alert('📤 Илгээгдлээ!')" class="bg-sky-500 text-white px-4 py-2 rounded-xl text-xs font-bold">Илгээх</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 14. БАГШИЙН АРГА ЗҮЙ -->
+            <div id="sec-14" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">👩‍🏫 Багшийн арга зүй</h2>
+                <textarea rows="3" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="Арга зүйн дэвшилтэт туршлага..."></textarea>
+                <div class="flex gap-2 text-xs">
+                    <input type="file" class="border rounded-xl p-2 bg-gray-50">
+                    <button onclick="alert('✨ Хадгалагдлаа!')" class="bg-violet-600 text-white font-bold px-4 py-2 rounded-xl shadow">Хадгалах & Татах</button>
+                </div>
+            </div>
+
+            <!-- 15. ИРЦ -->
+            <div id="sec-15" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">📅 Ирцийн нэгдсэн тайлан</h2>
+                <button onclick="alert('📥 Ирцийн тайлан татаж байна...')" class="bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow">Ирцийн тайлан татах</button>
+            </div>
+
+            <!-- 16. ЦЭЦЭРЛЭГИЙН ХЯНАЛТ -->
+            <div id="sec-16" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800">🛡️ Цэцэрлэгийн хяналт & Дотоод үйл ажиллагаа</h2>
+                <textarea rows="3" class="w-full border rounded-xl p-3 text-xs outline-none bg-gray-50" placeholder="ХАБЭА болон дотоод хяналтын тайлан..."></textarea>
+                <div class="flex gap-2 text-xs">
+                    <input type="file" class="border rounded-xl p-2 bg-gray-50">
+                    <button onclick="alert('✨ Хадгалагдлаа!')" class="bg-rose-600 text-white font-bold px-4 py-2 rounded-xl shadow">Хадгалах & Татах</button>
+                </div>
+            </div>
+
+            <!-- 17. ХУВИЙН ТОХИРГОО (ШИНЭЧИЛСЭН ХЭСЭГ) -->
+            <div id="sec-17" class="section-pane hidden bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-5">
+                <div class="border-b pb-3">
+                    <h2 class="text-lg font-bold text-gray-800">⚙️ Багшийн хувийн тохиргоо & Профайл</h2>
+                    <p class="text-xs text-gray-500">Та өөрийн овог нэр, холбоо барих мэдээлэл болон мэргэжлийн чиглэлээ энд тохируулна.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Профайл зураг оруулах хэсэг -->
+                    <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-3xl p-4 bg-orange-50/30 text-center">
+                        <div id="teacherAvatarPreview" class="w-24 h-24 bg-orange-200 rounded-full flex items-center justify-center text-4xl shadow-md mb-3 overflow-hidden">
+                            👩‍🏫
+                        </div>
+                        <label class="bg-orange-400 hover:bg-orange-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow cursor-pointer transition">
+                            📷 Зураг оруулах
+                            <input type="file" id="teacherPhotoInput" accept="image/*" class="hidden" onchange="previewTeacherPhoto(event)">
+                        </label>
+                        <p class="text-[10px] text-gray-400 mt-2">JPG, PNG форматын зураг</p>
+                    </div>
+
+                    <!-- Мэдээлэл шивэх хэсэг -->
+                    <div class="md:col-span-2 space-y-3 text-xs">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">👤 Багшийн овог, нэр</label>
+                                <input type="text" id="tFullName" placeholder="Жишээ: Д. Баярмаа" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">🎓 Мэргэжлийн чиглэл</label>
+                                <input type="text" id="tMajor" placeholder="Жишээ: СӨБ-ын багш / Арга зүйч" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">📞 Утасны дугаар</label>
+                                <input type="text" id="tPhone" placeholder="99112233" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-700 mb-1">✉️ Gmail хаяг</label>
+                                <input type="email" id="tEmail" placeholder="teacher@gmail.com" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1">🔒 Шинэ нууц үг солих</label>
+                            <input type="password" id="tPass" placeholder="••••••••" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none">
+                        </div>
+
+                        <button onclick="saveTeacherProfile()" class="bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 text-white font-bold px-6 py-3 rounded-xl shadow-md transition">
+                            💾 Өөрчлөлтийг хадгалах
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript Логик -->
+    <script>
+        function syncChildToSharedStore({ name, group, age, regNo, parent, allergies = [], attendance = 'Ирсэн' }) {
+  if (typeof SharedStore === 'undefined') return;
+  SharedStore.update((store) => {
+    const exists = store.children.some(
+      (c) => (regNo && c.regNo === regNo) || (c.name === name && c.group === group)
+    );
+    if (!exists) {
+      store.children.push({
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        name,
+        group: group || 'Пороро бүлэг',
+        age: Number(age) || 5,
+        regNo: regNo || '',
+        parent: parent || '',
+        attendance,
+        allergies: Array.isArray(allergies) ? allergies : [],
+        avatar: '🧒'
+      });
+    }
+  });
+}
+        let schoolData = JSON.parse(localStorage.getItem('sob_teacher_groups_v3')) || {
+            "Пороро бүлэг": [
+                { id: 1, name: "Б. Тэмүүлэн", age: 5, parent: "Батбаяр (99112233)", attendance: "Ирсэн", avatar: "🧸", photo: "", video: "", voice: "" }
+            ]
+        };
+
+        let currentGroup = "Пороро бүлэг";
+        let teacherProfile = JSON.parse(localStorage.getItem('sob_teacher_profile')) || {
+            name: "Багш аа", fullName: "Д. Баярмаа", major: "СӨБ-ын багш", phone: "99112233", email: "teacher@gmail.com", photo: ""
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateGroupDropdown();
+            renderStudents();
+            loadTeacherProfileToUI();
+        });
+
+        function updateGroupDropdown() {
+            const select = document.getElementById('activeGroupSelect');
+            select.innerHTML = '';
+            Object.keys(schoolData).forEach(gName => {
+                let opt = document.createElement('option');
+                opt.value = gName;
+                opt.innerText = gName;
+                if (gName === currentGroup) opt.selected = true;
+                select.appendChild(opt);
+            });
+            document.getElementById('asideGroupName').innerText = currentGroup;
+            document.getElementById('welcomeGroupName').innerText = currentGroup;
+        }
+
+        function changeActiveGroup() {
+            currentGroup = document.getElementById('activeGroupSelect').value;
+            document.getElementById('asideGroupName').innerText = currentGroup;
+            document.getElementById('welcomeGroupName').innerText = currentGroup;
+            renderStudents();
+        }
+
+        function createNewGroup() {
+            let newName = prompt("Шинэ бүлгийн нэрийг оруулна уу:");
+            if (!newName) return;
+            newName = newName.trim();
+            if (schoolData[newName]) { alert("⚠️ Ийм бүлэг аль хэдийн байна!"); return; }
+            schoolData[newName] = [];
+            currentGroup = newName;
+            saveAndRefresh();
+        }
+
+        function addStudentToGroup() {
+            const name = document.getElementById('newStudentName').value.trim();
+            const age = document.getElementById('newStudentAge').value.trim();
+            const parent = document.getElementById('newStudentParent').value.trim();
+            const attendance = document.getElementById('newStudentAttendance').value;
+
+            if (!name || !age || !parent) {
+                alert("⚠️ Бүх талбарыг бөглөнө үү!");
+                return;
+            }
+
+            schoolData[currentGroup].push({
+                id: Date.now(), name, age, parent, attendance, avatar: "👶", photo: "", video: "", voice: ""
+            });
+
+            document.getElementById('newStudentName').value = '';
+            document.getElementById('newStudentAge').value = '';
+            document.getElementById('newStudentParent').value = '';
+            saveAndRefresh();
+        }
+
+        function renderStudents() {
+            const container = document.getElementById('studentCardsContainer');
+            container.innerHTML = '';
+            const students = schoolData[currentGroup] || [];
+
+            let total = students.length;
+            let present = students.filter(s => s.attendance === 'Ирсэн').length;
+            let absent = total - present;
+
+            document.getElementById('dashTotalCount').innerText = total;
+            document.getElementById('dashPresentCount').innerText = present;
+            document.getElementById('dashAbsentCount').innerText = absent;
+
+            if (students.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 italic text-xs col-span-2">Энэ бүлэгт хүүхэд байхгүй байна.</p>`;
+                return;
+            }
+
+            students.forEach(s => {
+                container.innerHTML += `
+                    <div class="bg-orange-50/20 border border-orange-100 rounded-2xl p-4 space-y-3 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center text-2xl shadow">
+                                    ${s.avatar}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-sm">${s.name}</h4>
+                                    <p class="text-[11px] text-gray-500">${s.age} настай • Эцэг/эх: ${s.parent}</p>
+                                </div>
+                            </div>
+                            <button onclick="deleteStudent(${s.id})" class="text-red-400 hover:text-red-600 text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-orange-100 text-[11px]">
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">🖼️ Аватар</label>
+                                <select onchange="updateStudentAttr(${s.id}, 'avatar', this.value)" class="w-full border rounded-lg p-1.5 bg-white font-bold">
+                                    <option value="👶" ${s.avatar==='👶'?'selected':''}>👶 Энгийн</option>
+                                    <option value="🧸" ${s.avatar==='🧸'?'selected':''}>🧸 Баавгай</option>
+                                    <option value="🦊" ${s.avatar==='🦊'?'selected':''}>🦊 Үнэг</option>
+                                    <option value="🐼" ${s.avatar==='🐼'?'selected':''}>🐼 Панда</option>
+                                    <option value="🦄" ${s.avatar==='🦄'?'selected':''}>🦄 Ганц эвэрт</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">📸 Зураг</label>
+                                <input type="file" accept="image/*" onchange="uploadMedia(${s.id}, 'photo', event)" class="w-full text-[10px]">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Багшийн профайлыг хадгалах ба ачаалах
+        function previewTeacherPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    teacherProfile.photo = e.target.result;
+                    document.getElementById('teacherAvatarPreview').innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded-full">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveTeacherProfile() {
+            teacherProfile.fullName = document.getElementById('tFullName').value.trim();
+            teacherProfile.major = document.getElementById('tMajor').value.trim();
+            teacherProfile.phone = document.getElementById('tPhone').value.trim();
+            teacherProfile.email = document.getElementById('tEmail').value.trim();
+            
+            localStorage.setItem('sob_teacher_profile', JSON.stringify(teacherProfile));
+            document.getElementById('welcomeTeacherName').innerText = teacherProfile.fullName || "Багш аа";
+            alert("✨ Таны хувийн мэдээлэл амжилттай хадгалагдлаа!");
+        }
+
+        function loadTeacherProfileToUI() {
+            document.getElementById('tFullName').value = teacherProfile.fullName || "";
+            document.getElementById('tMajor').value = teacherProfile.major || "";
+            document.getElementById('tPhone').value = teacherProfile.phone || "";
+            document.getElementById('tEmail').value = teacherProfile.email || "";
+            document.getElementById('welcomeTeacherName').innerText = teacherProfile.fullName || "Багш аа";
+            if (teacherProfile.photo) {
+                document.getElementById('teacherAvatarPreview').innerHTML = `<img src="${teacherProfile.photo}" class="w-full h-full object-cover rounded-full">`;
+            }
+        }
+
+        function updateStudentAttr(id, attr, val) {
+            let student = schoolData[currentGroup].find(s => s.id === id);
+            if(student) { student[attr] = val; saveAndRefresh(); }
+        }
+
+        function uploadMedia(id, type, event) {
+            const file = event.target.files[0];
+            if(file) {
+                let student = schoolData[currentGroup].find(s => s.id === id);
+                if(student) { student[type] = file.name; saveAndRefresh(); alert(`✨ Хавсаргалаа: ${file.name}`); }
+            }
+        }
+
+        function deleteStudent(id) {
+            if(confirm("Устгахдаа итгэлтэй байна уу?")) {
+                schoolData[currentGroup] = schoolData[currentGroup].filter(s => s.id !== id);
+                saveAndRefresh();
+            }
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('sob_teacher_groups_v3', JSON.stringify(schoolData));
+            updateGroupDropdown();
+            renderStudents();
+        }
+
+        function switchSection(sectionId, btnElement) {
+            document.querySelectorAll('.section-pane').forEach(pane => pane.classList.add('hidden'));
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('bg-orange-50', 'text-orange-600', 'font-bold');
+                btn.classList.add('hover:bg-gray-50');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+            btnElement.classList.remove('hover:bg-gray-50');
+            btnElement.classList.add('bg-orange-50', 'text-orange-600', 'font-bold');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Эцэг Эхийн Нэгдсэн Самбар</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff9f43;
+            --primary-hover: #ff922b;
+            --secondary-color: #0984e3;
+            --bg-gradient: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 50%, #74b9ff 100%);
+            --card-bg: #ffffff;
+            --text-color: #2f3542;
+            --border-color: #ffeaa7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Зүүн талын навигацийн цэс */
+        aside {
+            width: 290px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px dashed var(--border-color);
+            background: #fff8e8;
+        }
+
+        .sidebar-header h2 {
+            font-size: 15px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .sidebar-menu {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: calc(100vh - 130px);
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 9px 12px;
+            margin-bottom: 5px;
+            border: 2px solid transparent;
+            background: #fffdf9;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #57606f;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .menu-btn:hover {
+            background: #ffeaa7;
+            color: #2f3542;
+            border-color: #fdcb6e;
+        }
+
+        .menu-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+            box-shadow: 0 4px 10px rgba(255, 159, 67, 0.3);
+        }
+
+        /* Баруун талын үндсэн контент */
+        main {
+            flex: 1;
+            margin-left: 290px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 4px solid #fff;
+        }
+
+        .section-pane { display: none; }
+        .section-pane.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.title {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 22px;
+        }
+
+        .subtitle {
+            color: #747d8c;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #57606f;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 13px;
+            background-color: #fffdf9;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(255, 159, 67, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        th, td {
+            border: 1px solid #dfe4ea;
+            padding: 10px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #ffeaa7;
+            color: #2d3436;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn:hover { background-color: #74b9ff; transform: translateY(-1px); }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(255, 159, 67, 0.3);
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-export {
+            background-color: #00b894;
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+        }
+        .btn-export:hover { background-color: #26af5f; }
+
+        .btn-mic {
+            background-color: #ffa502;
+            box-shadow: 0 4px 10px rgba(255, 165, 2, 0.3);
+            color: white;
+            border: none;
+            padding: 9px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .btn-mic:hover { background-color: #ff9f1a; }
+
+        .alert-box {
+            background: #fff8e8;
+            border-left: 4px solid var(--primary-color);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        /* БҮЛГИЙН ЧАТЫН ЗАГВАР */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 480px;
+            background: #fffdf9;
+            border-radius: 15px;
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .message.received {
+            background: #f1f0f6;
+            align-self: flex-start;
+            color: #2f3542;
+        }
+
+        .message.sent {
+            background: var(--primary-color);
+            align-self: flex-end;
+            color: white;
+        }
+
+        .chat-input-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-top: 2px solid var(--border-color);
+            padding: 12px;
+            background: #fff;
+        }
+
+        .chat-input-box input[type="text"] {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 12px;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ЗҮҮН ТАЛЫН НАВИГАЦИЙН ЦЭС -->
+    <aside>
+        <div>
+            <div class="sidebar-header">
+                <h2>👨‍👩‍👧 Эцэг Эхийн Самбар</h2>
+                <p style="font-size: 11px; color: #747d8c;">Чандмань-Өндөр СӨБ</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <button class="menu-btn active" onclick="switchSection('sec-1', this)"><i class="fa-solid fa-house"></i> 1. Нүүр & Хүүхдийн профайл</button>
+                <button class="menu-btn" onclick="switchSection('sec-2', this)"><i class="fa-solid fa-clipboard-user"></i> 2. Миний хүүхдийн ирц</button>
+                <button class="menu-btn" onclick="switchSection('sec-3', this)"><i class="fa-solid fa-eye"></i> 3. Ажиглалт & Үнэлгээ (СҮД)</button>
+                <button class="menu-btn" onclick="switchSection('sec-4', this)"><i class="fa-solid fa-utensils"></i> 4. Хоолны цэс & Санал өгөх</button>
+                <button class="menu-btn" onclick="switchSection('sec-5', this)"><i class="fa-solid fa-stethoscope"></i> 5. Эмчийн зөвлөмж & Харшил</button>
+                <button class="menu-btn" onclick="switchSection('sec-6', this)"><i class="fa-solid fa-comments"></i> 6. Бүлгийн шууд чат 💬</button>
+                <button class="menu-btn" onclick="switchSection('sec-7', this)"><i class="fa-solid fa-folder-open"></i> 7. Хувийн хавтас & Тайлан</button>
+            </div>
+        </div>
+
+        <div style="padding: 12px; border-top: 2px dashed var(--border-color); text-align: center;">
+            <a href="login.html" style="font-size: 12px; color: #ff4757; font-weight: bold; text-decoration: none;">🚪 Системээс гарах</a>
+        </div>
+    </aside>
+
+    <!-- БАРУУН ТАЛЫН ҮНДСЭН КОНТЕНТ -->
+    <main>
+        <div class="container">
+
+            <!-- 1. НҮҮР & ХҮҮХДИЙН ПРОФАЙЛ -->
+            <div id="sec-1" class="section-pane active">
+                <h2 class="title">🏠 Хүүхдийн профайл & Мэдээлэл</h2>
+                <p class="subtitle">Таны хүүхдийн цэцэрлэг дэх үндсэн мэдээлэл болон шуурхай зарлалууд.</p>
+                <div class="alert-box"><b>📢 Цэцэрлэгээс:</b> Маргааш 10:00 цагт "Бяцхан аялал" үйл ажиллагаа болно.</div>
+                <div style="background:#fff9f0; padding:20px; border-radius:15px; border:2px dashed var(--primary-color); display:flex; gap:20px; align-items:center;">
+                    <div style="font-size:50px; background:#fff; padding:15px; border-radius:50%; border:3px solid var(--primary-color);">👦</div>
+                    <div>
+                        <h3 style="color:var(--primary-color); font-size:18px;">Батбаярын Тэмүүлэн</h3>
+                        <p style="font-size:12px; color:#57606f;">Регистр: УД19253412 | Нас: 5 настай</p>
+                        <p style="font-size:12px; color:#0984e3; font-weight:bold; margin-top:3px;">👶 Пороро бүлэг (Дунд бүлэг)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. МИНИЙ ХҮҮХДИЙН ИРЦ -->
+            <div id="sec-2" class="section-pane">
+                <h2 class="title">📋 Миний хүүхдийн ирц</h2>
+                <p class="subtitle">Хүүхдийнхээ өдөр тутмын ирцийн төлөвийг шалгах.</p>
+                <table>
+                    <thead><tr><th>Огноо</th><th>Төлөв</th><th>Шалтгаан</th></tr></thead>
+                    <tbody>
+                        <tr><td>2026-11-17</td><td><b style="color:#2ed573;">Ирсэн ✅</b></td><td>-</td></tr>
+                        <tr><td>2026-11-16</td><td><b style="color:#2ed573;">Ирсэн ✅</b></td><td>-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 3. АЖИГЛАЛТ & ҮНЭЛГЭЭ (СҮД) -->
+            <div id="sec-3" class="section-pane">
+                <h2 class="title">👁️ Ажиглалт & Хөгжлийн үнэлгээ (СҮД)</h2>
+                <p class="subtitle">Багшийн оруулсан өдрийн ажиглалт болон хүүхдийн хөгжлийн түвшин.</p>
+                <div class="form-group">
+                    <label>Багшийн тэмдэглэл:</label>
+                    <textarea rows="3" readonly>Өнөөдөр өглөө төвөггүй бие даан тоглоомоо хурааж, бусадтайгаа найрсгаар хуваалцаж тоглолоо. 🌟</textarea>
+                </div>
+                <button class="btn btn-export" onclick="alert('📥 Тайлан татаж байна...')"><i class="fa-solid fa-file-arrow-down"></i> Тайлан татах / Хэвлэх</button>
+            </div>
+
+            <!-- 4. ХООЛНЫ ЦЭС & САГАЛ ӨГӨХ -->
+            <div id="sec-4" class="section-pane">
+                <h2 class="title">🍲 Хоолны цэс & Санал хүсэлт өгөх</h2>
+                <p class="subtitle">Өдрийн болон 7 хоногийн хоолны цэстэй танилцаж, өөрийн санал зөвлөгөөг илгээх.</p>
+                <div class="alert-box"><b>🍲 Өнөөдрийн хоол:</b> Будаатай шөл, котлет, аарцтай цай.</div>
+                <div class="form-group">
+                    <label>Хоолны амт, чанар дээр санал хүсэлт бичих</label>
+                    <textarea rows="3" placeholder="Сэтгэгдэл, саналаа энд бичнэ үү..."></textarea>
+                </div>
+                <div class="form-group"><label>Зураг / Файл хавсаргах</label><input type="file"></div>
+                <button class="btn btn-primary" onclick="alert('✨ Санал амжилттай илгээгдлээ!')">Санал илгээх</button>
+            </div>
+
+            <!-- 5. ЭМЧИЙН ЗӨВЛӨМЖ & ХАРШИЛ -->
+            <div id="sec-5" class="section-pane">
+                <h2 class="title">🩺 Эмчийн зөвлөмж & Харшлын карт</h2>
+                <p class="subtitle">Эмчийн нийтэлсэн эрүүл ахуйн зөвлөмж болон хүүхдийн харшлын мэдээлэл.</p>
+                <div class="alert-box"><b>🩺 Эмчээс:</b> Өвлийн улиралд дархлаа дэмжих витаминтай хоол хүнс түлхүү хэрэглэх.</div>
+                <div class="form-group">
+                    <label>Харшлын мэдээлэл (Эмчээр баталгаажсан)</label>
+                    <input type="text" value="Өндөг, самар (Хатуу хориглох!)" readonly style="color:#ff4757; font-weight:bold;">
+                </div>
+                <button class="btn btn-export" onclick="alert('📥 Эмчийн зөвлөмжийг татаж байна...')">Татах / Хэвлэх</button>
+            </div>
+
+            <!-- 6. БҮЛГИЙН ШУУД ЧАТ -->
+            <div id="sec-6" class="section-pane">
+                <h2 class="title">💬 Пороро бүлгийн шууд чат</h2>
+                <p class="subtitle">Үндсэн багш (Д.Батбаяр), Туслах багш (С.Саран) болон бүлгийн бусад эцэг эхчүүдтэй харилцах чат.</p>
+                
+                <div class="chat-container">
+                    <div class="chat-messages">
+                        <div class="message received"><b>Д.Батбаяр (Багш):</b> Сайн байна уу эрхэм эцэг эхчүүдээ! Маргааш хүүхдүүд биеийн тамирын хувцастай ирээрэй.</div>
+                        <div class="message received"><b>С.Саран (Туслах):</b> Мөн өдөр нь жимсний цагтай шүү.</div>
+                        <div class="message sent"><b>Та (Тэмүүлэнгүй эцэг эх):</b> Сайн байна уу багш аа, ойлголоо баярлалаа! 😊</div>
+                    </div>
+
+                    <div class="chat-input-box">
+                        <button class="btn-mic" onclick="alert('🔴 Микрофон асаж байна... Дуут мессеж бичиж байна.')" title="Дуут мессеж илгээх"><i class="fa-solid fa-microphone"></i></button>
+                        <input type="file" id="chatFile" style="display:none;" onchange="alert('📎 Файл хавсаргагдлаа!')">
+                        <button class="btn" style="background:#0984e3;" onclick="document.getElementById('chatFile').click();" title="Файл/Зураг хавсаргах"><i class="fa-solid fa-paperclip"></i></button>
+                        <input type="text" placeholder="Бүлгийн чат руу мессеж бичих...">
+                        <button class="btn btn-primary" onclick="alert('📤 Мессеж бүлэгт илгээгдлээ!')">Илгээх</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. ХУВИЙН ХАВТАС & ТАЙЛАН -->
+            <div id="sec-7" class="section-pane">
+                <h2 class="title">📂 Хувийн хавтас & Баримт бичиг</h2>
+                <p class="subtitle">Хүүхдийн төрсөн гэрчилгээ, эрүүл мэндийн карт болон бусад файлууд.</p>
+                <table>
+                    <thead><tr><th>Файлын нэр</th><th>Төрөл</th><th>Үйлдэл</th></tr></thead>
+                    <tbody>
+                        <tr><td>Төрсөн гэрчилгээний хуулбар</td><td>PDF</td><td><button class="btn btn-export" style="padding:3px 8px; font-size:11px;" onclick="alert('📥 Татаж байна...')">Татах</button></td></tr>
+                        <tr><td>Эрүүл мэндийн карт</td><td>PDF</td><td><button class="btn btn-export" style="padding:3px 8px; font-size:11px;" onclick="alert('📥 Татаж байна...')">Татах</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function renderParentShared() {
+  if (typeof SharedStore === 'undefined') return;
+  const store = SharedStore.get();
+  const child = store.children[0];
+
+  // 2. Ирц
+  const attBody = document.querySelector('#sec-2 tbody');
+  if (attBody && child) {
+    const color = child.attendance === 'Ирсэн' ? '#2ed573' : '#ff4757';
+    attBody.innerHTML = `
+      <tr>
+        <td>${nowFormatted().split(' ')[0]}</td>
+        <td><b style="color:${color};">${child.attendance}</b></td>
+        <td>-</td>
+      </tr>`;
+  }
+
+  // 3. Ажиглалт & СҮД[cite: 34]
+  const obsArea = document.querySelector('#sec-3 textarea');
+  const latestObs = store.observations.find((o) => o.shareWithParent);
+  if (obsArea && latestObs) {
+    obsArea.value = `[${latestObs.date} | ${latestObs.category} | ${latestObs.score}] ${latestObs.conclusion}`;
+  }
+
+  // 6. Бүлгийн чат[cite: 34]
+  const chatBox = document.querySelector('#sec-6 .chat-messages');
+  if (chatBox) {
+    chatBox.innerHTML = store.chatMessages
+      .map((m) => {
+        const cls = m.role === 'parent' ? 'sent' : 'received';
+        return `<div class="message ${cls}"><b>${m.sender} (${m.time}):</b> ${m.text}</div>`;
+      })
+      .join('');
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+}
+
+function sendParentChatMessage() {
+  const input = document.querySelector('#sec-6 .chat-input-box input[type="text"]');
+  const text = input ? input.value.trim() : '';
+  if (!text) return;
+
+  SharedStore.update((store) => {
+    store.chatMessages.push({
+      id: Date.now(),
+      group: 'Пороро бүлэг',
+      sender: 'Эцэг эх',
+      role: 'parent',
+      text,
+      time: nowFormatted().split(' ')[1]
+    });
+  });
+  input.value = '';
+}
+
+const sendChatBtn = document.querySelector('#sec-6 .chat-input-box .btn-primary');
+const chatTextInput = document.querySelector('#sec-6 .chat-input-box input[type="text"]');
+if (sendChatBtn) sendChatBtn.onclick = sendParentChatMessage;
+if (chatTextInput) {
+  chatTextInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendParentChatMessage();
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderParentShared();
+  if (typeof SharedStore !== 'undefined') {
+    SharedStore.onChange(renderParentShared);
+  }
+});
+        function switchSection(sectionId, btnElement) {
+            document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Эрхлэгчийн Нэгдсэн Самбар</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6b81;
+            --primary-hover: #ff4757;
+            --secondary-color: #2ed573;
+            --bg-gradient: linear-gradient(135deg, #fbc531 0%, #ff6b81 50%, #70a1ff 100%);
+            --card-bg: #ffffff;
+            --text-color: #2f3542;
+            --border-color: #ffdde1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        aside {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px dashed var(--border-color);
+            background: #fff0f3;
+        }
+
+        .sidebar-header h2 {
+            font-size: 14px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .sidebar-menu {
+            padding: 8px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: calc(100vh - 120px);
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 4px;
+            border: 2px solid transparent;
+            background: #fff9fa;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #57606f;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .menu-btn:hover {
+            background: #ffeaa7;
+            color: #2f3542;
+            border-color: #fdcb6e;
+        }
+
+        .menu-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+
+        main {
+            flex: 1;
+            margin-left: 300px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 4px solid #fff;
+        }
+
+        .section-pane { display: none; }
+        .section-pane.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.title {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        .subtitle {
+            color: #747d8c;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #57606f;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 12px;
+            background-color: #fff9fa;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(255, 107, 129, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        th, td {
+            border: 1px solid #dfe4ea;
+            padding: 9px;
+            text-align: left;
+            font-size: 11px;
+        }
+
+        th {
+            background-color: #ffeaa7;
+            color: #2d3436;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn:hover { background-color: #26af5f; transform: translateY(-1px); }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-danger {
+            background-color: #ff4757;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+        }
+        .btn-danger:hover { background-color: #ff6b81; }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 8px;
+            background: #fff9fa;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #57606f;
+            cursor: pointer;
+        }
+
+        .checkbox-label input {
+            width: auto;
+        }
+
+        .stat-card {
+            background: #fff0f3;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px dashed var(--primary-color);
+            text-align: center;
+        }
+
+        .stat-card h3 { font-size: 20px; color: var(--primary-color); margin-bottom: 5px; }
+        .stat-card p { font-size: 11px; color: #57606f; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div>
+            <div class="sidebar-header">
+                <h2>👑 Эрхлэгчийн Самбар</h2>
+                <p style="font-size: 10px; color: #747d8c;">Чандмань-Өндөр СӨБ (2026-2027)</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <button class="menu-btn active" onclick="switchSection('sec-1', this)"><i class="fa-solid fa-chart-line"></i> 1. Хяналтын самбар</button>
+                <button class="menu-btn" onclick="switchSection('sec-2', this)"><i class="fa-solid fa-book-open"></i> 2. Сургалтын хөтөлбөр</button>
+                <button class="menu-btn" onclick="switchSection('sec-3', this)"><i class="fa-solid fa-children"></i> 3. Бүлэг ба Хүүхдүүд</button>
+                <button class="menu-btn" onclick="switchSection('sec-4', this)"><i class="fa-solid fa-users-gear"></i> 4. Албан хаагчид</button>
+                <button class="menu-btn" onclick="switchSection('sec-5', this)"><i class="fa-solid fa-triangle-exclamation"></i> 5. Эрсдэлт бүлэг</button>
+                <button class="menu-btn" onclick="switchSection('sec-6', this)"><i class="fa-solid fa-hands-holding-child"></i> 6. ХБХ-тэй хүүхэд</button>
+                <button class="menu-btn" onclick="switchSection('sec-7', this)"><i class="fa-solid fa-shield-halved"></i> 7. Цэцэрлэгийн хяналт</button>
+                <button class="menu-btn" onclick="switchSection('sec-8', this)"><i class="fa-solid fa-utensils"></i> 8. Хоол үйлдвэрлэл</button>
+                <button class="menu-btn" onclick="switchSection('sec-9', this)"><i class="fa-solid fa-stethoscope"></i> 9. Эмч зөвлөж байна</button>
+                <button class="menu-btn" onclick="switchSection('sec-10', this)"><i class="fa-solid fa-file-lines"></i> 10. Тайлан (9–5 сар)</button>
+                <button class="menu-btn" onclick="switchSection('sec-11', this)"><i class="fa-solid fa-list-check"></i> 11. Даалгавар сан</button>
+                <button class="menu-btn" onclick="switchSection('sec-12', this)"><i class="fa-solid fa-star"></i> 12. Удирдлагын хөгжил</button>
+                <button class="menu-btn" onclick="switchSection('sec-13', this)"><i class="fa-solid fa-graduation-cap"></i> 13. Сургуульд бэлтгэгдсэн байдал</button>
+                <button class="menu-btn" onclick="switchSection('sec-14', this)"><i class="fa-solid fa-gears"></i> 14. Тохиргоо цэс</button>
+            </div>
+        </div>
+
+        <div style="padding: 10px; border-top: 2px dashed var(--border-color); text-align: center;">
+            <a href="login.html" style="font-size: 11px; color: #ff4757; font-weight: bold; text-decoration: none;">🚪 Системээс гарах</a>
+        </div>
+    </aside>
+
+    <main>
+        <div class="container">
+
+            <!-- 1. ХЯНАЛТЫН САМБАР -->
+            <div id="sec-1" class="section-pane active">
+                <h2 class="title">📊 Хяналтын самбар</h2>
+                <p class="subtitle">Цэцэрлэгийн үйл ажиллагааны ерөнхий нэгтгэл ба хурдан шилжих товчлуурууд.</p>
+                <div class="form-grid">
+                    <div class="stat-card"><h3>120</h3><p>Нийт хүүхдийн тоо</p></div>
+                    <div class="stat-card"><h3>6</h3><p>Нийт бүлэг (Үндсэн + Хувилбарт)</p></div>
+                    <div class="stat-card"><h3>18</h3><p>Албан хаагчдын тоо</p></div>
+                    <div class="stat-card" style="border-color:#ff4757; background:#fff5f5;"><h3 style="color:#ff4757;">3</h3><p>Эрсдэлтэй & ХБХ хүүхэд</p></div>
+                </div>
+            </div>
+
+            <!-- 2. СУРГАЛТЫН ХӨТӨЛБӨР -->
+            <div id="sec-2" class="section-pane">
+                <h2 class="title">📚 Сургалтын хөтөлбөр ба төлөвлөгөө</h2>
+                <p class="subtitle">Багш нарын жилийн, сарын, 7 хоног, өдрийн төлөвлөгөө болон дэглэм хянах.</p>
+            </div>
+
+            <!-- 3. БҮЛЭГ БА ХҮҮХДҮҮД -->
+            <div id="sec-3" class="section-pane">
+                <h2 class="title">🧸 Бүлэг ба Хүүхдүүд</h2>
+                <p class="subtitle">Үндсэн болон хувилбарт бүлгийн хүүхдийн бүртгэл.</p>
+            </div>
+
+            <!-- 4. АЛБАН ХААГЧИД -->
+            <div id="sec-4" class="section-pane">
+                <h2 class="title">👥 Албан хаагчдын удирдлага</h2>
+                <p class="subtitle">Ажилтан бүртгэх, эрх үүсгэх.</p>
+            </div>
+
+            <!-- 5. ЭРСДЭЛТ БҮЛЭГ -->
+            <div id="sec-5" class="section-pane">
+                <h2 class="title">⚠️ Эрсдэлт бүлгийн хүүхэд</h2>
+                <p class="subtitle">Анхаарал хандуулах шаардлагатай хүүхдийн хяналт.</p>
+            </div>
+
+            <!-- 6. ХБХ-ТЭЙ ХҮҮХЭД -->
+            <div id="sec-6" class="section-pane">
+                <h2 class="title">🧩 ХБХ-тэй хүүхэд</h2>
+                <p class="subtitle">Тусгай хэрэгцээт боловсрол шаардлагатай хүүхдийн хөгжлийн хяналт.</p>
+            </div>
+
+            <!-- 7. ЦЭЦЭРЛЭГИЙН ХЯНАЛТ (Багийн гишүүдийг чекбоксоор бүртгэх хэсэг) -->
+            <div id="sec-7" class="section-pane">
+                <h2 class="title">🛡️ Цэцэрлэгийн хяналт & Ажилтнуудын багийн хуваарилалт</h2>
+                <p class="subtitle">Ажилтныг бүртгэхдээ аль багт ажиллахыг чекбоксоор тэмдэглэнэ.</p>
+                
+                <div class="form-group">
+                    <label>Ажилтны овог, нэр</label>
+                    <input type="text" id="staffNameInput" placeholder="Жишээ: Д. Батсуурь">
+                </div>
+
+                <div class="form-group">
+                    <label>Ажилтны албан тушаал / Gmail</label>
+                    <input type="text" id="staffRoleInput" placeholder="Жишээ: Арга зүйч / batsuur@gmail.com">
+                </div>
+
+                <div class="form-group">
+                    <label>📌 Харьяалагдах баг/хэсгүүдийг сонгох (Чеклэх)</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label"><input type="checkbox" name="teamCheck" value="Дотоод хяналт"> Дотоод хяналт</label>
+                        <label class="checkbox-label"><input type="checkbox" name="teamCheck" value="Архив"> Архив</label>
+                        <label class="checkbox-label"><input type="checkbox" name="teamCheck" value="Хүний нөөц"> Хүний нөөц</label>
+                        <label class="checkbox-label"><input type="checkbox" name="teamCheck" value="Ёс зүй"> Ёс зүй</label>
+                        <label class="checkbox-label"><input type="checkbox" name="teamCheck" value="Дэмжлэгийн баг"> Дэмжлэгийн баг</label>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="saveStaffTeamMember()">💾 Ажилтны багийн хуваарилалт хадгалах</button>
+
+                <h3 style="margin-top: 25px; font-size: 14px; color: #2f3542;">📋 Бүртгэлтэй ажилтнууд болон тэдний багууд:</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ажилтны нэр</th>
+                            <th>Албан тушаал</th>
+                            <th>Харьяалагдах багууд</th>
+                            <th>Үйлдэл</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffTeamTableBody">
+                        <!-- JS-ээр хадгалагдсан өгөгдөл орж ирнэ -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 8. ХООЛ ҮЙЛДВЭРЛЭЛ -->
+            <div id="sec-8" class="section-pane">
+                <h2 class="title">🍲 Хоол үйлдвэрлэл</h2>
+                <p class="subtitle">Хоолны 7 хоногийн төлөвлөгөө шалгах.</p>
+            </div>
+
+            <!-- 9. ЭМЧ ЗӨВЛӨЖ БАЙНА -->
+            <div id="sec-9" class="section-pane">
+                <h2 class="title">🩺 Эмч зөвлөж байна</h2>
+                <p class="subtitle">Эрүүл мэндийн зөвлөмж.</p>
+            </div>
+
+            <!-- 10. ТАЙЛАН -->
+            <div id="sec-10" class="section-pane">
+                <h2 class="title">📈 Тайлан (9–5 дугаар сар)</h2>
+                <p class="subtitle">Тайлан хянах.</p>
+            </div>
+
+            <!-- 11. ДААЛГАВАР САН -->
+            <div id="sec-11" class="section-pane">
+                <h2 class="title">📋 Даалгавар сан</h2>
+                <p class="subtitle">Даалгавар өгөх.</p>
+            </div>
+
+            <!-- 12. УДИРДЛАГЫН ХӨГЖИЛ -->
+            <div id="sec-12" class="section-pane">
+                <h2 class="title">🌟 Удирдлагын хөгжил</h2>
+                <p class="subtitle">Туршлага солилцох.</p>
+            </div>
+
+            <!-- 13. СУРГУУЛЬД БЭЛТГЭГДСЭН БАЙДАЛ -->
+            <div id="sec-13" class="section-pane">
+                <h2 class="title">🎓 Сургуульд бэлтгэгдсэн байдал</h2>
+                <p class="subtitle">Бэлтгэл бүлэг.</p>
+            </div>
+
+            <!-- 14. ТОХИРГОО -->
+            <div id="sec-14" class="section-pane">
+                <h2 class="title">⚙️ Системийн тохиргоо</h2>
+                <p class="subtitle">Тохиргоо хийх.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function switchSection(sectionId, btnElement) {
+            document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        // Ажилтнуудын багийн хуваарилалт хадгалах логик (LocalStorage ашиглав)
+        function saveStaffTeamMember() {
+            const name = document.getElementById('staffNameInput').value.trim();
+            const role = document.getElementById('staffRoleInput').value.trim();
+            const checkboxes = document.querySelectorAll('input[name="teamCheck"]:checked');
+
+            if (!name || !role) {
+                alert("⚠️ Ажилтны нэр болон албан тушаалыг бүрэн оруулна уу!");
+                return;
+            }
+
+            let selectedTeams = [];
+            checkboxes.forEach((cb) => {
+                selectedTeams.push(cb.value);
+            });
+
+            if (selectedTeams.length === 0) {
+                alert("⚠️ Дор хаяж нэг багийг сонгож чекэлнэ үү!");
+                return;
+            }
+
+            let staffList = JSON.parse(localStorage.getItem('sob_staff_teams')) || [];
+            staffList.push({ name, role, teams: selectedTeams });
+            localStorage.setItem('sob_staff_teams', JSON.stringify(staffList));
+
+            alert("✨ Ажилтны багийн хуваарилалт амжилттай хадгалагдлаа!");
+            document.getElementById('staffNameInput').value = '';
+            document.getElementById('staffRoleInput').value = '';
+            checkboxes.forEach(cb => cb.checked = false);
+
+            loadStaffTeamTable();
+        }
+
+        function loadStaffTeamTable() {
+            const tbody = document.getElementById('staffTeamTableBody');
+            if(!tbody) return;
+            
+            let staffList = JSON.parse(localStorage.getItem('sob_staff_teams')) || [];
+            
+            if (staffList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#747d8c;">Бүртгэлтэй ажилтан байхгүй байна.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = staffList.map((s, index) => `
+                <tr>
+                    <td><b>${s.name}</b></td>
+                    <td>${s.role}</td>
+                    <td><span style="color: #0984e3; font-weight: bold;">${s.teams.join(', ')}</span></td>
+                    <td><button class="btn btn-danger" style="padding:2px 6px;" onclick="deleteStaff(${index})">Устгах</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteStaff(index) {
+            let staffList = JSON.parse(localStorage.getItem('sob_staff_teams')) || [];
+            staffList.splice(index, 1);
+            localStorage.setItem('sob_staff_teams', JSON.stringify(staffList));
+            loadStaffTeamTable();
+        }
+
+        window.onload = loadStaffTeamTable;
+    </script>
+</body>
+</html>

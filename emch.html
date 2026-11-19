@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Бүлгийн Удирдлага ба Даалгаврын Сан</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Fredoka', sans-serif; background-color: #fcf8f2; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: #fed7aa; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden p-4 gap-4">
+
+    <!-- ЗҮҮН ТАЛЫН ЖАГСААЛТ БОЛОН УДИРДЛАГА -->
+    <aside class="w-80 bg-white border border-orange-100 rounded-3xl flex flex-col justify-between shadow-sm overflow-hidden">
+        <div>
+            <!-- Лого ба гарчиг -->
+            <div class="p-4 flex items-center justify-between border-b border-orange-100 bg-orange-50/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-orange-500 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-orange-200">
+                        🧸
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-gray-800 text-xs">Цэцэрлэгийн Систем</h1>
+                        <p class="text-[11px] text-orange-500 font-semibold" id="currentGroupName">Пороро бүлэг</p>
+                    </div>
+                </div>
+                <button onclick="openAddStudentModal()" class="w-9 h-9 bg-orange-400 hover:bg-orange-500 text-white rounded-xl flex items-center justify-center font-bold shadow transition transform hover:scale-105" title="Шинэ хүүхэд нэмэх">
+                    +
+                </button>
+            </div>
+
+            <!-- Бүлэг шүүх болон хайлт -->
+            <div class="p-3 border-b border-orange-50 space-y-2">
+                <select id="groupFilter" onchange="filterStudents()" class="w-full text-xs border border-orange-200 rounded-xl p-2 bg-orange-50/30 font-bold text-orange-600 focus:outline-none">
+                    <option value="ALL">Бүх бүлгүүд</option>
+                    <option value="Пороро бүлэг">Пороро бүлэг</option>
+                    <option value="Маша бүлэг">Маша бүлэг</option>
+                    <option value="Бяцхан од бүлэг">Бяцхан од бүлэг</option>
+                </select>
+                <input type="text" id="studentSearchInput" onkeyup="filterStudents()" placeholder="Хүүхдийн нэрээр хайх..." class="w-full text-xs border border-orange-200 rounded-xl p-2 bg-orange-50/30 focus:outline-none focus:ring-2 focus:ring-orange-400">
+            </div>
+
+            <!-- Сурагчдын картууд -->
+            <nav id="studentCardsContainer" class="px-3 py-2 space-y-2 overflow-y-auto sidebar-scroll" style="max-height: calc(100vh - 240px);">
+                <!-- JS-ээр үүснэ -->
+            </nav>
+        </div>
+
+        <div class="p-3 border-t border-orange-100 bg-orange-50/30 flex justify-between items-center text-xs text-gray-500">
+            <span>Нийт: <b id="totalCount" class="text-orange-600">0</b> сурагч</span>
+            <button onclick="localStorage.clear(); location.reload();" class="text-[10px] text-red-500 hover:underline">Өгөгдөл цэвэрлэх</button>
+        </div>
+    </aside>
+
+    <!-- БАРУУН ТАЛЫН ҮНДСЭН ПРОФАЙЛ БОЛОН ДААЛГАВАР ИЛГЭЭХ ХЭСЭГ -->
+    <main class="flex-1 bg-white border border-orange-100 rounded-3xl shadow-sm overflow-y-auto p-6 space-y-6">
+        
+        <div id="noStudentSelected" class="text-center py-40 space-y-3">
+            <div class="text-5xl">👈</div>
+            <h3 class="text-lg font-bold text-gray-700">Хүүхэд сонгогдоогүй байна</h3>
+            <p class="text-xs text-gray-400 max-w-sm mx-auto">Хүүхдийн мэдээллийг засах, бүлэг солих болон ирээгүй үед нь даалгавар илгээхийн тулд зүүн талын жагсаалтаас сонгоно уу.</p>
+        </div>
+
+        <!-- Идэвхтэй хүүхдийн самбар -->
+        <div id="activeStudentPanel" class="hidden space-y-6">
+            
+            <!-- Дээд баннер профайл -->
+            <div class="bg-gradient-to-r from-orange-400 to-amber-400 rounded-3xl p-6 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="relative w-16 h-16 rounded-2xl overflow-hidden shadow-md border-2 border-white bg-orange-100 flex items-center justify-center">
+                        <img id="bannerAvatar" src="" class="w-full h-full object-cover hidden">
+                        <span id="bannerEmoji" class="text-2xl">👧👦</span>
+                    </div>
+                    <div>
+                        <h2 id="profileName" class="text-xl font-bold">Нэр</h2>
+                        <p id="profileMeta" class="text-orange-100 text-xs">Бүлэг • Нас: 5</p>
+                    </div>
+                </div>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="openEditModal()" class="bg-white/20 hover:bg-white/30 text-white text-xs font-bold py-2.5 px-4 rounded-xl backdrop-blur-md transition">
+                        <i class="fa-solid fa-pen-to-square mr-1"></i> Мэдээлэл засах & Бүлэг солих
+                    </button>
+                    <button onclick="saveProfileChanges()" class="bg-white text-orange-600 hover:bg-orange-50 text-xs font-bold py-2.5 px-4 rounded-xl shadow transition">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> Хадгалах
+                    </button>
+                </div>
+            </div>
+
+            <!-- 1. Ирээгүй / Чөлөөтэй сурагчдад даалгавар илгээх хэсэг -->
+            <div class="bg-orange-50/30 border border-orange-200 p-5 rounded-3xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-sm text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane text-orange-500"></i> Ирээгүй / Чөлөөтэй сурагчийн гэрийн даалгавар илгээх
+                    </h3>
+                    <span id="attendanceBadge" class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold">Ирсэн төлөвтэй</span>
+                </div>
+                <p class="text-xs text-gray-500">Хэрэв хүүхэд цэцэрлэгт ирээгүй эсвэл чөлөөтэй байгаа бол өдрийн СҮД болон үзээгүй хичээлийг эцэг эх рүү нь шууд даалгавар болгон илгээнэ.</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="font-bold text-gray-600 mb-1 block">Өнөөдрийн Суралцахуйн үр дүн (СҮД)</label>
+                        <input type="text" id="taskSubject" value="Танин мэдэхүй: Байгаль орчинтой танилцах" class="w-full border border-orange-200 rounded-xl p-2.5 bg-white outline-none">
+                    </div>
+                    <div>
+                        <label class="font-bold text-gray-600 mb-1 block">Дуусах хугацаа</label>
+                        <input type="date" id="taskDueDate" class="w-full border border-orange-200 rounded-xl p-2.5 bg-white outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="font-bold text-gray-600 mb-1 block">Даалгаврын агуулга, заавар</label>
+                    <textarea id="taskContent" rows="3" class="w-full border border-orange-200 rounded-xl p-2.5 bg-white outline-none text-xs" placeholder="Гэртээ хийх дасгал даалгаврын тайлбар..."></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button onclick="sendTaskToParent()" class="bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold py-2.5 px-5 rounded-xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-share-nodes"></i> Эцэг эх рүү даалгавар илгээх
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. Хувийн хавтас ба анкет -->
+            <div class="bg-orange-50/20 border border-orange-100 p-5 rounded-3xl space-y-4">
+                <h3 class="font-bold text-sm text-gray-800"><i class="fa-solid fa-file-pen text-orange-500 mr-1"></i> Хувийн хавтасны анкет</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <div>
+                        <label class="font-bold text-gray-600">Дуртай хоол</label>
+                        <input type="text" id="anketFood" class="w-full border border-orange-200 rounded-xl p-2.5 mt-1 bg-white outline-none">
+                    </div>
+                    <div>
+                        <label class="font-bold text-gray-600">Сайн найз</label>
+                        <input type="text" id="anketFriend" class="w-full border border-orange-200 rounded-xl p-2.5 mt-1 bg-white outline-none">
+                    </div>
+                    <div>
+                        <label class="font-bold text-gray-600">Хобби / Сонирхол</label>
+                        <input type="text" id="anketHobby" class="w-full border border-orange-200 rounded-xl p-2.5 mt-1 bg-white outline-none">
+                    </div>
+                    <div>
+                        <label class="font-bold text-gray-600">Харшилтай зүйл</label>
+                        <input type="text" id="anketAllergy" class="w-full border border-orange-200 rounded-xl p-2.5 mt-1 bg-white outline-none text-emerald-600 font-bold">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Сурагч бүртгэх болон Засах Modal -->
+    <div id="studentModal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border-4 border-orange-100 space-y-4">
+            <h2 id="modalTitle" class="text-lg font-bold text-orange-500 text-center">🎨 Шинэ сурагч бүртгэх</h2>
+            <form onsubmit="handleSaveStudent(event)" class="space-y-3">
+                <input type="hidden" id="editIndex" value="-1">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Овог, нэр</label>
+                    <input type="text" id="inputName" required class="w-full text-xs border border-orange-200 rounded-xl p-3 bg-orange-50/30 focus:outline-none" placeholder="Жишээ: Тэмүүлэн Батбаяр">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Анги / Бүлэг (Солих боломжтой)</label>
+                    <select id="inputGroup" class="w-full text-xs border border-orange-200 rounded-xl p-3 bg-orange-50/30 font-bold text-orange-600 focus:outline-none">
+                        <option value="Пороро бүлэг">Пороро бүлэг</option>
+                        <option value="Маша бүлэг">Маша бүлэг</option>
+                        <option value="Бяцхан од бүлэг">Бяцхан од бүлэг</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Нас</label>
+                        <input type="number" id="inputAge" required class="w-full text-xs border border-orange-200 rounded-xl p-3 bg-orange-50/30 focus:outline-none" placeholder="5">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Ирцийн төлөв</label>
+                        <select id="inputAttendance" class="w-full text-xs border border-orange-200 rounded-xl p-3 bg-orange-50/30 font-bold focus:outline-none">
+                            <option value="Ирсэн">Ирсэн</option>
+                            <option value="Өвчтэй">Өвчтэй (Ирээгүй)</option>
+                            <option value="Чөлөөтэй">Чөлөөтэй (Ирээгүй)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Эцэг/эх ба утас</label>
+                    <input type="text" id="inputParent" required class="w-full text-xs border border-orange-200 rounded-xl p-3 bg-orange-50/30 focus:outline-none" placeholder="Батбаяр (99112233)">
+                </div>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 text-xs font-semibold rounded-2xl hover:bg-gray-200 transition">Болих</button>
+                    <button type="submit" class="flex-1 py-3 bg-orange-400 text-white text-xs font-semibold rounded-2xl hover:bg-orange-500 transition shadow">Хадгалах</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Логик -->
+    <script>
+        let students = JSON.parse(localStorage.getItem('sob_system_students_v2')) || [
+            { id: 1, name: "Т. Ананд", group: "Пороро бүлэг", age: 5, parent: "Төмөр (99112233)", attendance: "Ирсэн", image: "", food: "Банштай цай", friend: "Хулан", hobby: "Лего", allergy: "Харшилгүй" },
+            { id: 2, name: "Б. Тэмүүлэн", group: "Пороро бүлэг", age: 5, parent: "Батбаяр (88112233)", attendance: "Өвчтэй", image: "", food: "Хуушуур", friend: "Төгөлдөр", hobby: "Зураг", allergy: "Сүү" },
+            { id: 3, name: "А. Номин", group: "Маша бүлэг", age: 4, parent: "Номинсувд (99887766)", attendance: "Чөлөөтэй", image: "", food: "Жигнэмэг", friend: "Анар", hobby: "Дуулах", allergy: "Өндөг" }
+        ];
+
+        let selectedId = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderList();
+            if (students.length > 0) selectStudent(students[0].id);
+        });
+
+        function renderList() {
+            const container = document.getElementById('studentCardsContainer');
+            container.innerHTML = '';
+            
+            const filterGroup = document.getElementById('groupFilter').value;
+            const searchKeyword = document.getElementById('studentSearchInput').value.toLowerCase();
+
+            const filtered = students.filter(s => {
+                let matchGroup = (filterGroup === 'ALL' || s.group === filterGroup);
+                let matchSearch = s.name.toLowerCase().includes(searchKeyword);
+                return matchGroup && matchSearch;
+            });
+
+            document.getElementById('totalCount').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">Сурагч олдсонгүй.</p>`;
+                return;
+            }
+
+            filtered.forEach(s => {
+                let isSelected = selectedId === s.id;
+                let badgeColor = s.attendance === 'Ирсэн' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600';
+                
+                container.innerHTML += `
+                    <div onclick="selectStudent(${s.id})" class="p-3 rounded-2xl border cursor-pointer transition flex items-center justify-between ${isSelected ? 'bg-orange-500 text-white border-orange-500 shadow-sm' : 'bg-orange-50/30 border-orange-100 hover:bg-orange-50 text-gray-800'}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl ${isSelected ? 'bg-white text-orange-500' : 'bg-orange-200/70 text-orange-700'} flex items-center justify-center font-bold text-xs shadow-2xs">
+                                🧸
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold">${s.name}</div>
+                                <div class="text-[10px] ${isSelected ? 'text-orange-100' : 'text-gray-400'}">${s.group} • <span class="px-1.5 py-0.5 rounded ${badgeColor} font-semibold">${s.attendance}</span></div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold">➔</span>
+                    </div>
+                `;
+            });
+        }
+
+        function filterStudents() {
+            renderList();
+        }
+
+        function selectStudent(id) {
+            selectedId = id;
+            const s = students.find(item => item.id === id);
+            if (!s) return;
+
+            document.getElementById('noStudentSelected').classList.add('hidden');
+            document.getElementById('activeStudentPanel').classList.remove('hidden');
+
+            document.getElementById('profileName').innerText = s.name;
+            document.getElementById('profileMeta').innerText = `${s.group} • Нас: ${s.age} • Эцэг эх: ${s.parent}`;
+            
+            let attBadge = document.getElementById('attendanceBadge');
+            attBadge.innerText = `Ирцийн төлөв: ${s.attendance}`;
+            attBadge.className = s.attendance === 'Ирсэн' 
+                ? 'text-xs bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold' 
+                : 'text-xs bg-rose-100 text-rose-700 px-3 py-1 rounded-full font-bold';
+
+            document.getElementById('anketFood').value = s.food || "";
+            document.getElementById('anketFriend').value = s.friend || "";
+            document.getElementById('anketHobby').value = s.hobby || "";
+            document.getElementById('anketAllergy').value = s.allergy || "";
+
+            renderList();
+        }
+
+        function saveProfileChanges() {
+            const s = students.find(item => item.id === selectedId);
+            if (s) {
+                s.food = document.getElementById('anketFood').value;
+                s.friend = document.getElementById('anketFriend').value;
+                s.hobby = document.getElementById('anketHobby').value;
+                s.allergy = document.getElementById('anketAllergy').value;
+                localStorage.setItem('sob_system_students_v2', JSON.stringify(students));
+                alert("✨ Анкетын мэдээлэл амжилттай хадгалагдлаа!");
+            }
+        }
+
+        function sendTaskToParent() {
+            const s = students.find(item => item.id === selectedId);
+            const subject = document.getElementById('taskSubject').value;
+            const dueDate = document.getElementById('taskDueDate').value;
+            const content = document.getElementById('taskContent').value;
+
+            if (!content) {
+                alert("⚠️ Даалгаврын агуулгыг оруулна уу!");
+                return;
+            }
+
+            alert(`📤 Амжилттай илгээгдлээ!\n\nСурагч: ${s.name} (${s.attendance})\nЭцэг эх рүү өдрийн СҮД болон даалгавар мессеж хэлбэрээр амжилттай очлоо.`);
+        }
+
+        function openAddStudentModal() {
+            document.getElementById('modalTitle').innerText = "🎨 Шинэ сурагч бүртгэх";
+            document.getElementById('editIndex').value = "-1";
+            document.getElementById('inputName').value = "";
+            document.getElementById('inputAge').value = "";
+            document.getElementById('inputParent').value = "";
+            document.getElementById('inputAttendance').value = "Ирсэн";
+            document.getElementById('studentModal').classList.remove('hidden');
+            document.getElementById('studentModal').classList.add('flex');
+        }
+
+        function openEditModal() {
+            const s = students.find(item => item.id === selectedId);
+            if (!s) return;
+
+            document.getElementById('modalTitle').innerText = "✏️ Сурагчийн мэдээлэл засах & Бүлэг солих";
+            document.getElementById('editIndex').value = s.id;
+            document.getElementById('inputName').value = s.name;
+            document.getElementById('inputGroup').value = s.group;
+            document.getElementById('inputAge').value = s.age;
+            document.getElementById('inputParent').value = s.parent;
+            document.getElementById('inputAttendance').value = s.attendance;
+
+            document.getElementById('studentModal').classList.remove('hidden');
+            document.getElementById('studentModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('studentModal').classList.remove('flex');
+            document.getElementById('studentModal').classList.add('hidden');
+        }
+
+        function handleSaveStudent(e) {
+            e.preventDefault();
+            const editId = Number(document.getElementById('editIndex').value);
+            
+            const name = document.getElementById('inputName').value;
+            const group = document.getElementById('inputGroup').value;
+            const age = document.getElementById('inputAge').value;
+            const parent = document.getElementById('inputParent').value;
+            const attendance = document.getElementById('inputAttendance').value;
+
+            if (editId === -1) {
+                // Шинэ сурагч нэмэх
+                const newS = {
+                    id: Date.now(),
+                    name, group, age, parent, attendance,
+                    image: "", food: "", friend: "", hobby: "", allergy: "Харшилгүй"
+                };
+                students.push(newS);
+                selectedId = newS.id;
+            } else {
+                // Засах болон бүлэг солих
+                const s = students.find(item => item.id === editId);
+                if (s) {
+                    s.name = name;
+                    s.group = group;
+                    s.age = age;
+                    s.parent = parent;
+                    s.attendance = attendance;
+                }
+            }
+
+            localStorage.setItem('sob_system_students_v2', JSON.stringify(students));
+            closeModal();
+            renderList();
+            selectStudent(selectedId);
+            alert("✨ Мэдээлэл амжилттай хадгалагдлаа!");
+        }
+    </script>
+</body>
+</html>

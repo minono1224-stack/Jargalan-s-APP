@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <script src="shared-store.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чандмань-Өндөр СӨБ - Нэг удаагийн код авах</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, #fff3e0 0%, #e1f5fe 50%, #f3e5f5 100%); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-teal-100 text-center space-y-6">
+        <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-teal-400 to-emerald-500 rounded-3xl flex items-center justify-center text-4xl text-white shadow-lg">
+            🔑
+        </div>
+        
+        <div>
+            <h1 class="text-2xl font-black text-slate-800">Нэг удаагийн код авах</h1>
+            <p class="text-xs text-slate-500 mt-1">Утасны дугаар эсвэл Gmail хаягаа оруулж баталгаажуулна уу.</p>
+        </div>
+
+        <!-- 1-р алхам: Утас / Gmail оруулах хэсэг -->
+        <div id="step-1" class="space-y-4 text-left">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Утасны дугаар эсвэл Gmail</label>
+                <input type="text" id="userInput" placeholder="99112233 эсвэл user@gmail.com" class="w-full p-3 border-2 border-slate-200 rounded-2xl text-sm outline-none focus:border-teal-500">
+            </div>
+            <button onclick="generateOTP()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition">
+                📩 Код илгээх (Үүсгэх)
+            </button>
+        </div>
+
+        <!-- 2-р алхам: Код оруулах хэсэг (Эхэндээ нууц байна) -->
+        <div id="step-2" class="space-y-4 text-left hidden">
+            <!-- Туршилтаар үүссэн кодыг энд харуулна -->
+            <div id="mockCodeAlert" class="bg-amber-50 border-2 border-amber-200 text-amber-800 p-3 rounded-2xl text-xs font-bold text-center">
+                <!-- Жишээ код энд бичигдэнэ -->
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Ирсэн 4 оронтой кодыг оруулна уу</label>
+                <input type="text" id="enteredCode" placeholder="1234" maxlength="4" class="w-full p-3 border-2 border-slate-200 rounded-2xl text-center text-lg font-black tracking-widest outline-none focus:border-teal-500">
+            </div>
+            <button onclick="verifyOTP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-2xl shadow-lg transition">
+                ✨ Код шалгаж нэвтрэх
+            </button>
+            <button onclick="resetStep()" class="w-full text-xs text-slate-400 font-bold hover:text-slate-600 pt-1">
+                ← Буцах / Дугаар өөрчлөх
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let generatedOTPCode = "";
+
+        function generateOTP() {
+            const inputVal = document.getElementById('userInput').value.trim();
+            if(!inputVal) {
+                alert("Утасны дугаар эсвэл Gmail хаягаа оруулна уу!");
+                return;
+            }
+
+            // 4 оронтой санамсаргүй код үүсгэх (Жнь: 5821)
+            generatedOTPCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+            // Дэлгэц дээр код үүссэнийг харуулах (Тестийн зорилгоор системд мессеж ирсэн мэт харуулна)
+            document.getElementById('mockCodeAlert').innerHTML = `
+                📱 Системд мессеж / Имейл ирлээ!<br>
+                Таны авах баталгаажуулах код: <b style="font-size: 16px; color: #d97706;">${generatedOTPCode}</b>
+            `;
+
+            // 1-р хэсгийг нууж, 2-р хэсгийг гаргаж ирэх
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
+        }
+
+        function verifyOTP() {
+            const entered = document.getElementById('enteredCode').value.trim();
+            
+            if(entered === generatedOTPCode) {
+                alert("🎉 Код амжилттай баталгаажлаа! Системд нэвтэрч байна.");
+                // Хүссэн хуудас руу шилжүүлэх (Жнь: children_2.html эсвэл erhlegch_2.html)
+                window.location.href = "children_2.html"; 
+            } else {
+                alert("❌ О оруулсан код буруу байна! Дахин шалгана уу.");
+            }
+        }
+
+        function resetStep() {
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-1').classList.remove('hidden');
+            document.getElementById('enteredCode').value = "";
+        }
+    </script>
+</body>
+</html>
